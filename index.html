@@ -869,19 +869,35 @@
             Swal.fire({
                 title: `Tambah Calon ${type==='ketua'?'Ketua':'Wakil Ketua'}`,
                 html: `<input id="swal-k-nama" class="swal2-input" placeholder="Nama Lengkap">
-                       <input id="swal-k-foto" class="swal2-input" placeholder="URL Foto (opsional)">
+                       <div class="mt-3 text-start px-3"><label class="form-label text-muted fw-bold mb-1" style="font-size:14px;">Upload Foto (JPG/PNG):</label>
+                       <input type="file" id="swal-k-foto" class="form-control" accept="image/jpeg, image/png"></div>
                        <textarea id="swal-k-visi" class="swal2-textarea" placeholder="Visi"></textarea>
                        <textarea id="swal-k-misi" class="swal2-textarea" placeholder="Misi"></textarea>`,
                 showCancelButton:true, confirmButtonText:'Simpan', cancelButtonText:'Batal',
-                preConfirm: () => ({
-                    nama: document.getElementById('swal-k-nama').value.trim(),
-                    foto: document.getElementById('swal-k-foto').value.trim(),
-                    visi: document.getElementById('swal-k-visi').value.trim(),
-                    misi: document.getElementById('swal-k-misi').value.trim()
-                })
+                preConfirm: () => {
+                    const nama = document.getElementById('swal-k-nama').value.trim();
+                    const visi = document.getElementById('swal-k-visi').value.trim();
+                    const misi = document.getElementById('swal-k-misi').value.trim();
+                    const fileInput = document.getElementById('swal-k-foto');
+                    
+                    if (!nama) { Swal.showValidationMessage('Nama wajib diisi!'); return false; }
+                    
+                    if (fileInput.files.length > 0) {
+                        const file = fileInput.files[0];
+                        return new Promise((resolve) => {
+                            const reader = new FileReader();
+                            reader.onload = function(e) {
+                                resolve({ nama, visi, misi, base64Data: e.target.result.split(',')[1], mimeType: file.type, fileName: file.name });
+                            };
+                            reader.readAsDataURL(file);
+                        });
+                    } else {
+                        return { nama, visi, misi };
+                    }
+                }
             }).then(async result => {
-                if(result.isConfirmed && result.value.nama) {
-                    showLoading('Menyimpan...');
+                if(result.isConfirmed && result.value) {
+                    showLoading('Menyimpan... (Bisa memakan waktu jika dengan foto)');
                     await fetchAPI('addCandidate', {type, ...result.value});
                     closeLoading(); showToast('success','Kandidat ditambahkan'); fetchAdminData();
                 }
