@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VTC Voting 2026/2027</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -12,83 +12,174 @@
 
     <style>
         :root {
-            --purple: #2d1b69; --purple-light: #46337e;
-            --blue: #1368ce; --blue-light: #2196f3;
-            --pink: #e91e63; --pink-light: #f48fb1;
-            --yellow: #ffc107; --green: #4caf50; --orange: #ff5722;
-            --dark-bg: #1a0a3e; --card-bg: rgba(255,255,255,0.1);
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --secondary: #64748b;
+            --success: #16a34a;
+            --danger: #dc2626;
+            --warning: #d97706; /* Darker yellow/orange for readability */
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
         }
-        body { font-family:'Outfit',sans-serif; background:linear-gradient(135deg,var(--dark-bg),var(--purple)); color:white; min-height:100vh; margin:0; overflow-x:hidden; }
+        
+        body { 
+            font-family: 'Outfit', sans-serif; 
+            background-color: var(--bg-color); 
+            color: var(--text-main); 
+            min-height: 100vh; 
+            margin: 0; 
+            overflow-x: hidden; 
+        }
 
+        /* Screen Management */
         .screen { display:none; opacity:0; transition:opacity 0.3s ease; min-height:100vh; flex-direction:column; align-items:center; justify-content:center; width:100%; padding:20px; }
         .screen.active { display:flex; opacity:1; }
-        .screen-top { justify-content:flex-start; padding-top:2rem; padding-bottom:5rem; }
+        .screen-top { justify-content:flex-start; padding-top:2rem; padding-bottom:6rem; }
 
-        .glassmorphism { background:var(--card-bg); backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,0.2); border-radius:16px; }
+        /* Clean Card UI */
+        .clean-card { 
+            background: var(--card-bg); 
+            border: 1px solid var(--border-color); 
+            border-radius: 16px; 
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03); 
+        }
 
-        .btn-kahoot { background:var(--yellow); color:var(--dark-bg); font-weight:800; border:none; border-bottom:5px solid #d4a000; border-radius:12px; padding:15px 30px; transition:all 0.2s; text-transform:uppercase; letter-spacing:1px; cursor:pointer; }
-        .btn-kahoot:hover { transform:translateY(-2px); border-bottom:7px solid #d4a000; }
-        .btn-kahoot:active { transform:translateY(3px); border-bottom:2px solid #d4a000; }
-        .btn-kahoot-green { background:var(--green); color:white; border-bottom-color:#388e3c; }
-        .btn-kahoot-green:hover { border-bottom-color:#388e3c; color:white; }
-        .btn-kahoot-blue { background:var(--blue-light); color:white; border-bottom-color:#1976d2; }
-        .btn-kahoot-blue:hover { border-bottom-color:#1976d2; color:white; }
+        /* Buttons */
+        .btn-clean { 
+            background: var(--primary); 
+            color: white; 
+            font-weight: 600; 
+            border: none; 
+            border-radius: 10px; 
+            padding: 14px 28px; 
+            transition: all 0.2s ease; 
+            cursor: pointer; 
+            box-shadow: 0 2px 4px rgba(37,99,235,0.2); 
+            text-transform: uppercase; 
+            letter-spacing: 0.5px;
+        }
+        .btn-clean:hover { background: var(--primary-hover); transform: translateY(-1px); box-shadow: 0 4px 6px rgba(37,99,235,0.3); color: white; }
+        .btn-clean:active { transform: translateY(1px); box-shadow: none; }
+        .btn-clean:disabled { background: #cbd5e1; cursor: not-allowed; box-shadow: none; transform: none; color: #94a3b8; }
+        
+        .btn-green { background: var(--success); box-shadow: 0 2px 4px rgba(22,163,74,0.2); }
+        .btn-green:hover { background: #15803d; box-shadow: 0 4px 6px rgba(22,163,74,0.3); }
 
-        @keyframes float { 0%{transform:translateY(0)} 50%{transform:translateY(-15px)} 100%{transform:translateY(0)} }
-        .floating { animation:float 3s ease-in-out infinite; }
-        @keyframes pulse { 0%{transform:scale(0.95);box-shadow:0 0 0 0 rgba(255,193,7,0.7)} 70%{transform:scale(1);box-shadow:0 0 0 20px rgba(255,193,7,0)} 100%{transform:scale(0.95);box-shadow:0 0 0 0 rgba(255,193,7,0)} }
-        .pulsing { animation:pulse 2s infinite; }
-        @keyframes pulse-red { 0%{box-shadow:0 0 0 0 rgba(233,30,99,0.7)} 70%{box-shadow:0 0 0 20px rgba(233,30,99,0)} 100%{box-shadow:0 0 0 0 rgba(233,30,99,0)} }
-        .pulsing-red { animation:pulse-red 1s infinite !important; }
-        @keyframes bounce-scale { 0%{transform:scale(0)} 50%{transform:scale(1.2)} 100%{transform:scale(1)} }
-        .bounce-in { animation:bounce-scale 0.5s cubic-bezier(0.175,0.885,0.32,1.275) forwards; }
-        @keyframes radar { 0%{transform:scale(0);opacity:1} 100%{transform:scale(3);opacity:0} }
-        .radar-circle { position:absolute; width:100px; height:100px; border:2px solid var(--blue-light); border-radius:50%; animation:radar 2s infinite; }
-        @keyframes bg-pulse-red { 0%{background:linear-gradient(135deg,var(--dark-bg),var(--purple))} 50%{background:linear-gradient(135deg,#4a0d1e,var(--purple))} 100%{background:linear-gradient(135deg,var(--dark-bg),var(--purple))} }
-        .bg-pulse-red { animation:bg-pulse-red 2s infinite; }
+        .btn-outline-clean {
+            background: transparent;
+            color: var(--text-main);
+            border: 2px solid var(--border-color);
+            font-weight: 600;
+            border-radius: 10px;
+            padding: 12px 24px;
+            transition: all 0.2s;
+        }
+        .btn-outline-clean:hover { background: #f1f5f9; color: var(--text-main); }
 
-        .logo-main { width:150px; margin-bottom:20px; border-radius:50%; }
-        .input-kahoot { background:white; border:3px solid #ddd; border-radius:12px; padding:15px; font-size:1.5rem; text-align:center; font-weight:bold; color:#333; max-width:400px; width:100%; font-family:'Outfit'; }
-        .input-kahoot:focus { outline:none; border-color:var(--blue-light); box-shadow:0 0 15px var(--blue-light); }
+        /* Inputs */
+        .input-clean { 
+            background: #ffffff; 
+            border: 2px solid var(--border-color); 
+            border-radius: 12px; 
+            padding: 15px; 
+            font-size: 1.2rem; 
+            text-align: center; 
+            font-weight: 500; 
+            color: var(--text-main); 
+            width: 100%; 
+            max-width: 400px; 
+            transition: border-color 0.2s;
+        }
+        .input-clean:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
 
-        .timer-bar { position:fixed; top:0; left:0; width:100%; background:rgba(0,0,0,0.7); backdrop-filter:blur(5px); padding:10px 0; text-align:center; z-index:100; border-bottom:1px solid rgba(255,255,255,0.1); }
-        .timer-text { font-size:2.5rem; font-weight:900; color:white; }
-        .timer-warning { color:var(--yellow) !important; }
-        .timer-danger { color:var(--pink) !important; }
+        .logo-main { width: 140px; margin-bottom: 24px; }
 
-        .candidate-grid { display:grid; grid-template-columns:1fr; gap:20px; width:100%; max-width:1200px; padding:20px; margin-top:80px; }
+        /* Typography */
+        .text-ketua { color: var(--warning); }
+        .text-wakil { color: var(--primary); }
+        .fw-black { font-weight: 800; }
+
+        /* Timer Bar */
+        .timer-bar { 
+            position: fixed; top: 0; left: 0; width: 100%; 
+            background: rgba(255, 255, 255, 0.95); 
+            backdrop-filter: blur(8px); 
+            padding: 10px 0; text-align: center; z-index: 100; 
+            border-bottom: 1px solid var(--border-color); 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03); 
+            transition: background-color 0.3s;
+        }
+        .timer-text { font-size: 2rem; font-weight: 800; color: var(--text-main); transition: color 0.3s; }
+        .timer-warning { color: var(--warning) !important; }
+        .timer-danger { color: var(--danger) !important; }
+        .timer-bar.bg-danger-light { background: #fef2f2; border-color: #fca5a5; }
+
+        /* Candidate Grid */
+        .candidate-grid { display:grid; grid-template-columns:1fr; gap:24px; width:100%; max-width:1200px; padding:20px; margin-top:60px; }
         @media(min-width:577px){ .candidate-grid{grid-template-columns:1fr 1fr;} }
         @media(min-width:993px){ .candidate-grid{grid-template-columns:1fr 1fr 1fr;} }
 
-        .candidate-card { background:var(--card-bg); border:4px solid transparent; border-radius:20px; padding:20px; text-align:center; cursor:pointer; transition:all 0.3s cubic-bezier(0.175,0.885,0.32,1.275); position:relative; overflow:hidden; backdrop-filter:blur(10px); }
-        .candidate-card:hover { transform:scale(1.05); box-shadow:0 10px 30px rgba(0,0,0,0.5); border-color:rgba(255,255,255,0.3); }
-        .candidate-card.selected { border-color:var(--yellow); background:rgba(255,193,7,0.2); transform:scale(1.05); box-shadow:0 0 30px rgba(255,193,7,0.4); }
-        .candidate-card .check-overlay { position:absolute; top:-50px; right:10px; font-size:3rem; color:var(--yellow); transition:top 0.3s; }
-        .candidate-card.selected .check-overlay { top:10px; }
-        .candidate-img { width:120px; height:120px; border-radius:50%; object-fit:cover; border:4px solid white; box-shadow:0 0 15px rgba(255,255,255,0.5); margin-bottom:15px; }
-        .candidate-img-sm { width:50px; height:50px; border-radius:50%; object-fit:cover; border:2px solid white; }
-        .visi-misi { font-size:0.9rem; margin-top:15px; background:rgba(0,0,0,0.3); border-radius:10px; padding:10px; text-align:left; display:none; }
+        .candidate-card { 
+            background: var(--card-bg); 
+            border: 2px solid var(--border-color); 
+            border-radius: 16px; 
+            padding: 24px; 
+            text-align: center; 
+            cursor: pointer; 
+            transition: all 0.2s ease; 
+            position: relative; 
+        }
+        .candidate-card:hover { border-color: var(--primary); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); transform: translateY(-3px); }
+        .candidate-card.selected { border-color: var(--primary); background: #eff6ff; box-shadow: 0 0 0 2px var(--primary); transform: translateY(-3px); }
+        
+        .candidate-card .check-overlay { position:absolute; top:-40px; right:15px; font-size:2rem; color:var(--primary); transition:all 0.3s cubic-bezier(0.175,0.885,0.32,1.275); opacity:0; }
+        .candidate-card.selected .check-overlay { top:15px; opacity:1; }
+        
+        .candidate-img { width:120px; height:120px; border-radius:50%; object-fit:cover; border:4px solid #fff; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom:15px; }
+        .candidate-img-sm { width:45px; height:45px; border-radius:50%; object-fit:cover; border:1px solid var(--border-color); }
+        
+        .visi-misi { font-size:0.95rem; margin-top:15px; background:#f8fafc; border: 1px solid var(--border-color); border-radius:8px; padding:12px; text-align:left; display:none; color:var(--text-main); }
 
-        .winner-card { background:linear-gradient(135deg,rgba(255,193,7,0.3),rgba(255,87,34,0.3)); border:2px solid var(--yellow); border-radius:20px; padding:30px; text-align:center; max-width:400px; width:100%; margin:20px; box-shadow:0 0 50px rgba(255,193,7,0.5); }
-        .winner-card.wakil { background:linear-gradient(135deg,rgba(33,150,243,0.3),rgba(156,39,176,0.3)); border-color:var(--blue-light); box-shadow:0 0 50px rgba(33,150,243,0.5); }
-        .winner-photo { width:150px; height:150px; border-radius:50%; border:5px solid white; object-fit:cover; margin-bottom:15px; }
+        /* Winner Cards */
+        .winner-card { 
+            background: #fffbeb; border: 2px solid #fcd34d; border-radius: 20px; padding: 30px; text-align: center; max-width: 400px; width: 100%; margin: 20px; box-shadow: 0 10px 25px rgba(245, 158, 11, 0.15); 
+        }
+        .winner-card.wakil { background: #eff6ff; border-color: #bfdbfe; box-shadow: 0 10px 25px rgba(59, 130, 246, 0.15); }
+        .winner-photo { width:150px; height:150px; border-radius:50%; border:5px solid white; object-fit:cover; margin-bottom:15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
 
-        .bar-chart-row { display:flex; align-items:center; margin-bottom:10px; }
-        .bar-chart-label { width:120px; text-align:left; font-size:0.85rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; padding-right:10px; }
-        .bar-chart-bar-wrap { flex-grow:1; background:rgba(255,255,255,0.1); height:22px; border-radius:10px; overflow:hidden; }
-        .bar-chart-bar { height:100%; background:var(--blue-light); width:0%; transition:width 1s ease-out; border-radius:10px; }
-        .bar-chart-count { width:50px; text-align:right; font-size:0.9rem; font-weight:bold; }
+        /* Bar Charts */
+        .bar-chart-row { display:flex; align-items:center; margin-bottom:12px; }
+        .bar-chart-label { width:130px; text-align:left; font-size:0.95rem; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; padding-right:10px; }
+        .bar-chart-bar-wrap { flex-grow:1; background:#e2e8f0; height:24px; border-radius:12px; overflow:hidden; }
+        .bar-chart-bar { height:100%; background:var(--primary); width:0%; transition:width 1s ease-out; border-radius:12px; }
+        .bar-chart-count { width:60px; text-align:right; font-size:1rem; font-weight:bold; color:var(--text-main); }
 
-        .admin-nav .nav-link { color:white; border-radius:20px; margin:0 5px; }
-        .admin-nav .nav-link.active { background:var(--blue-light); color:white; font-weight:bold; }
-        .admin-content { background:var(--card-bg); border-radius:15px; padding:20px; min-height:60vh; width:100%; max-width:1200px; backdrop-filter:blur(10px); }
-        .table-dark-glass th,.table-dark-glass td { background:rgba(0,0,0,0.2); border-color:rgba(255,255,255,0.1); color:white; vertical-align:middle; }
+        /* Admin UI */
+        .admin-nav .nav-link { color:var(--text-muted); font-weight:500; border-radius:8px; margin:0 5px; padding: 10px 20px; }
+        .admin-nav .nav-link:hover { background:#f1f5f9; color:var(--text-main); }
+        .admin-nav .nav-link.active { background:var(--primary); color:white; }
+        .admin-content { padding:24px; min-height:60vh; width:100%; max-width:1200px; }
+        
+        /* Table Override */
+        .table-clean th { border-bottom-color: var(--border-color); color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.5px; }
+        .table-clean td { border-bottom-color: var(--border-color); vertical-align: middle; }
+
+        /* Animations */
+        @keyframes bounce-scale { 0%{transform:scale(0.8); opacity:0;} 50%{transform:scale(1.05);} 100%{transform:scale(1); opacity:1;} }
+        .bounce-in { animation:bounce-scale 0.5s cubic-bezier(0.175,0.885,0.32,1.275) forwards; }
+        @keyframes pulse-light { 0%{transform:scale(0.95); opacity:0.8;} 50%{transform:scale(1); opacity:1;} 100%{transform:scale(0.95); opacity:0.8;} }
+        .pulsing-light { animation:pulse-light 2s infinite; }
+        @keyframes radar-clean { 0%{transform:scale(0.5);opacity:0.8} 100%{transform:scale(2.5);opacity:0} }
+        .radar-circle { position:absolute; width:80px; height:80px; border:2px solid var(--primary); border-radius:50%; animation:radar-clean 2s infinite ease-out; }
 
         @media(max-width:576px) {
             .timer-text { font-size:1.8rem; }
             .candidate-img { width:90px; height:90px; }
             .winner-photo { width:110px; height:110px; }
-            .input-kahoot { font-size:1.2rem; padding:12px; }
+            .input-clean { font-size:1.1rem; padding:12px; }
         }
     </style>
 </head>
@@ -96,14 +187,14 @@
 
     <!-- ============ SCREEN 1: LANDING ============ -->
     <div id="screen-landing" class="screen active">
-        <img src="https://lh3.googleusercontent.com/d/1jqh2mardOYDJP5PPns9-DwxGWIobMX4K" alt="VTC Logo" class="logo-main floating">
-        <h1 class="text-center mb-2" style="font-weight:900; font-size:2.2rem; text-shadow:2px 2px 4px rgba(0,0,0,0.5);">PEMILIHAN KETUA & WAKIL KETUA</h1>
-        <p class="text-center mb-5 fs-5">Vocational Tax Corner &mdash; Periode 2026/2027</p>
-        <div class="glassmorphism p-4 p-md-5 text-center" style="max-width:500px; width:90%;">
-            <input type="text" id="voter-name" class="input-kahoot mb-4 d-block mx-auto" placeholder="Masukkan Nama Lengkap" autocomplete="off">
-            <button class="btn-kahoot w-100 fs-4" onclick="handleVoterEntry()">MASUK</button>
+        <img src="https://lh3.googleusercontent.com/d/1jqh2mardOYDJP5PPns9-DwxGWIobMX4K" alt="VTC Logo" class="logo-main">
+        <h1 class="text-center mb-2 fw-black" style="font-size:2.2rem; color: var(--text-main);">PEMILIHAN KETUA & WAKIL KETUA</h1>
+        <p class="text-center mb-5 fs-5 text-muted">Vocational Tax Corner &mdash; Periode 2026/2027</p>
+        <div class="clean-card p-4 p-md-5 text-center" style="max-width:500px; width:90%;">
+            <input type="text" id="voter-name" class="input-clean mb-4 d-block mx-auto" placeholder="Masukkan Nama Lengkap" autocomplete="off">
+            <button class="btn-clean w-100 fs-5" onclick="handleVoterEntry()">Masuk Sesi</button>
         </div>
-        <a href="#" class="mt-5 text-white-50 text-decoration-none" onclick="showScreen('screen-admin-login')">🔑 Admin</a>
+        <a href="#" class="mt-5 text-muted text-decoration-none" onclick="showScreen('screen-admin-login')"><i class="fa-solid fa-lock me-1"></i> Admin Panel</a>
     </div>
 
     <!-- ============ SCREEN 2: LOCATION CHECK ============ -->
@@ -112,81 +203,81 @@
             <div class="radar-circle" style="animation-delay:0s;"></div>
             <div class="radar-circle" style="animation-delay:0.5s;"></div>
             <div class="radar-circle" style="animation-delay:1s;"></div>
-            <i class="fa-solid fa-location-dot fs-1 text-white position-relative"></i>
+            <i class="fa-solid fa-location-dot fs-1 text-primary position-relative"></i>
         </div>
-        <h2 class="fw-bold mb-3" id="loc-status-text">📍 Memeriksa Lokasi Anda...</h2>
-        <p class="text-center text-white-50 px-3" id="loc-subtext">Pastikan Anda memberikan izin akses lokasi pada browser.</p>
-        <button id="btn-loc-retry" class="btn-kahoot btn-kahoot-blue mt-4" style="display:none;" onclick="checkLocation()">Coba Lagi</button>
+        <h2 class="fw-bold mb-3" id="loc-status-text">📍 Memeriksa Lokasi...</h2>
+        <p class="text-center text-muted px-3" id="loc-subtext">Pastikan Anda memberikan izin akses lokasi pada browser.</p>
+        <button id="btn-loc-retry" class="btn-clean mt-4" style="display:none;" onclick="checkLocation()">Coba Lagi</button>
     </div>
 
     <!-- ============ SCREEN 3: WAITING ROOM ============ -->
     <div id="screen-waiting" class="screen">
-        <div class="glassmorphism p-5 text-center d-flex flex-column justify-content-center align-items-center pulsing" style="width:280px;height:280px;border-radius:50%;">
-            <i class="fa-solid fa-hourglass-half fs-1 mb-3 text-warning"></i>
-            <h3 class="fw-bold m-0" style="font-size:1.1rem;">Menunggu Sesi Dibuka...</h3>
+        <div class="clean-card p-5 text-center d-flex flex-column justify-content-center align-items-center pulsing-light" style="width:280px;height:280px;border-radius:50%;">
+            <i class="fa-solid fa-hourglass-half fs-1 mb-3 text-primary"></i>
+            <h3 class="fw-bold m-0" style="font-size:1.2rem;">Menunggu Sesi...</h3>
         </div>
-        <div class="mt-5 glassmorphism px-4 py-2">
-            <h4 class="m-0" id="waiting-voter-count"><i class="fa-solid fa-users me-2"></i>-- peserta siap</h4>
+        <div class="mt-5 clean-card px-4 py-3">
+            <h5 class="m-0 text-muted" id="waiting-voter-count"><i class="fa-solid fa-users me-2"></i>-- peserta siap</h5>
         </div>
     </div>
 
     <!-- ============ SCREEN 4: VOTE KETUA ============ -->
     <div id="screen-vote-ketua" class="screen screen-top">
-        <div class="timer-bar"><div class="timer-text" id="timer-ketua">07:00</div></div>
+        <div class="timer-bar" id="top-bar-ketua"><div class="timer-text" id="timer-ketua">07:00</div></div>
         <div class="text-center mt-4">
-            <h1 style="font-weight:900;"><i class="fa-solid fa-crown text-warning me-2"></i>Pilih Ketua</h1>
-            <p class="fs-5 text-white-50">Vocational Tax Corner 2026/2027</p>
+            <h1 class="fw-black"><i class="fa-solid fa-crown text-ketua me-2"></i>Pilih Ketua</h1>
+            <p class="fs-5 text-muted">Vocational Tax Corner 2026/2027</p>
         </div>
         <div class="candidate-grid" id="grid-ketua"></div>
-        <div class="fixed-bottom p-3 p-md-4 text-center glassmorphism" style="border-radius:20px 20px 0 0;">
-            <button id="btn-lanjut-wakil" class="btn-kahoot w-100 fs-5" style="max-width:500px;" disabled onclick="goToWakil()">LANJUT &rarr; Pilih Wakil Ketua</button>
+        <div class="fixed-bottom p-3 p-md-4 text-center bg-white border-top shadow-sm" style="z-index: 10;">
+            <button id="btn-lanjut-wakil" class="btn-clean w-100 fs-5" style="max-width:500px;" disabled onclick="goToWakil()">LANJUT &rarr; Pilih Wakil</button>
         </div>
     </div>
 
     <!-- ============ SCREEN 5: VOTE WAKIL ============ -->
     <div id="screen-vote-wakil" class="screen screen-top">
-        <div class="timer-bar"><div class="timer-text" id="timer-wakil">07:00</div></div>
+        <div class="timer-bar" id="top-bar-wakil"><div class="timer-text" id="timer-wakil">07:00</div></div>
         <div class="text-center mt-4">
-            <h1 style="font-weight:900;"><i class="fa-solid fa-star text-info me-2"></i>Pilih Wakil Ketua</h1>
-            <p class="fs-5 text-white-50">Vocational Tax Corner 2026/2027</p>
+            <h1 class="fw-black"><i class="fa-solid fa-star text-wakil me-2"></i>Pilih Wakil Ketua</h1>
+            <p class="fs-5 text-muted">Vocational Tax Corner 2026/2027</p>
         </div>
         <div class="candidate-grid" id="grid-wakil"></div>
-        <div class="fixed-bottom p-3 p-md-4 text-center glassmorphism" style="border-radius:20px 20px 0 0; display:flex; justify-content:center; gap:10px;">
-            <button class="btn btn-outline-light fs-6 px-3" onclick="showScreen('screen-vote-ketua')" style="border-radius:12px;font-weight:bold;">&larr; KEMBALI</button>
-            <button id="btn-konfirmasi" class="btn-kahoot btn-kahoot-green fs-5 flex-grow-1" style="max-width:400px;" disabled onclick="goToConfirm()">KONFIRMASI &rarr;</button>
+        <div class="fixed-bottom p-3 p-md-4 text-center bg-white border-top shadow-sm" style="display:flex; justify-content:center; gap:15px; z-index: 10;">
+            <button class="btn-outline-clean fs-6 px-4" onclick="showScreen('screen-vote-ketua')">&larr; KEMBALI</button>
+            <button id="btn-konfirmasi" class="btn-clean btn-green fs-5 flex-grow-1" style="max-width:400px;" disabled onclick="goToConfirm()">KONFIRMASI &rarr;</button>
         </div>
     </div>
 
     <!-- ============ SCREEN 6: CONFIRM ============ -->
     <div id="screen-confirm" class="screen">
-        <h1 class="fw-bold mb-4">Konfirmasi Pilihan Anda</h1>
-        <div class="row w-100 justify-content-center px-3" style="max-width:800px; gap:20px;">
-            <div class="col-md-5 glassmorphism p-4 text-center">
-                <h4 class="text-warning fw-bold mb-3"><i class="fa-solid fa-crown me-1"></i>Ketua</h4>
+        <h2 class="fw-black mb-4">Konfirmasi Pilihan</h2>
+        <div class="row w-100 justify-content-center px-3" style="max-width:800px; gap:24px;">
+            <div class="col-md-5 clean-card p-4 text-center">
+                <h5 class="text-ketua fw-bold mb-3"><i class="fa-solid fa-crown me-1"></i>Ketua</h5>
                 <img id="confirm-img-ketua" src="" class="candidate-img mx-auto d-block">
-                <h3 id="confirm-nama-ketua" class="fw-bold mt-2">Nama</h3>
+                <h4 id="confirm-nama-ketua" class="fw-bold mt-2">Nama</h4>
             </div>
-            <div class="col-md-5 glassmorphism p-4 text-center">
-                <h4 class="text-info fw-bold mb-3"><i class="fa-solid fa-star me-1"></i>Wakil Ketua</h4>
+            <div class="col-md-5 clean-card p-4 text-center">
+                <h5 class="text-wakil fw-bold mb-3"><i class="fa-solid fa-star me-1"></i>Wakil Ketua</h5>
                 <img id="confirm-img-wakil" src="" class="candidate-img mx-auto d-block">
-                <h3 id="confirm-nama-wakil" class="fw-bold mt-2">Nama</h3>
+                <h4 id="confirm-nama-wakil" class="fw-bold mt-2">Nama</h4>
             </div>
         </div>
         <div class="mt-5 d-flex gap-3 flex-wrap justify-content-center w-100 px-3">
-            <button class="btn btn-outline-light fs-5 px-4" style="border-radius:12px;font-weight:bold;padding:15px 30px;" onclick="showScreen('screen-vote-ketua')">&larr; Ubah Pilihan</button>
-            <button class="btn-kahoot btn-kahoot-green fs-4" onclick="submitVote()"><i class="fa-solid fa-check me-2"></i>KIRIM SUARA</button>
+            <button class="btn-outline-clean fs-5" onclick="showScreen('screen-vote-ketua')">Ubah Pilihan</button>
+            <button class="btn-clean btn-green fs-5" onclick="submitVote()"><i class="fa-solid fa-check me-2"></i> KIRIM SUARA</button>
         </div>
     </div>
 
     <!-- ============ SCREEN 7: DONE ============ -->
     <div id="screen-done" class="screen">
-        <div class="glassmorphism p-5 text-center d-flex flex-column align-items-center">
-            <i class="fa-solid fa-circle-check text-success bounce-in" style="font-size:6rem; margin-bottom:20px;"></i>
-            <h1 class="fw-bold text-success">Suara Anda Telah Tercatat! ✅</h1>
-            <p class="fs-5 mt-3 mb-4">Menunggu hasil pemilihan...</p>
-            <div class="d-flex align-items-center mt-3 text-white-50">
-                <div class="spinner-border spinner-border-sm me-2" role="status"></div>
-                <span>Menunggu admin menutup sesi...</span>
+        <div class="clean-card p-5 text-center d-flex flex-column align-items-center">
+            <i class="fa-solid fa-circle-check text-success bounce-in" style="font-size:5rem; margin-bottom:20px;"></i>
+            <h2 class="fw-black text-success">Suara Tercatat!</h2>
+            <p class="fs-5 mt-2 mb-4 text-muted">Terima kasih atas partisipasi Anda.</p>
+            <div class="d-flex align-items-center mt-3 text-muted bg-light p-3 rounded">
+                <div class="spinner-border spinner-border-sm me-2 text-primary" role="status"></div>
+                <span class="fw-medium">Menunggu admin menutup sesi...</span>
             </div>
         </div>
     </div>
@@ -194,32 +285,41 @@
     <!-- ============ SCREEN 8: RESULT ============ -->
     <div id="screen-result" class="screen">
         <div id="result-phase-1" class="w-100 d-flex justify-content-center align-items-center position-absolute" style="z-index:10; min-height:100vh;">
-            <h1 style="font-size:3rem; letter-spacing:5px; opacity:0; transition:opacity 2s; font-weight:900;" id="result-title-main">Hasil Pemilihan...</h1>
+            <h1 style="font-size:3rem; letter-spacing:5px; opacity:0; transition:opacity 2s; font-weight:900; color:var(--text-main);" id="result-title-main">HASIL PEMILIHAN</h1>
         </div>
         <div id="result-phase-2" class="w-100 d-flex flex-column align-items-center justify-content-center py-5" style="opacity:0; display:none; min-height:100vh;">
-            <h1 class="fw-bold text-warning mb-4" style="text-shadow:0 0 20px rgba(255,193,7,0.5); font-weight:900;">✨ KETUA TERPILIH ✨</h1>
+            <h2 class="fw-black text-ketua mb-4">✨ KETUA TERPILIH ✨</h2>
             <div id="winner-ketua-card" class="winner-card bounce-in" style="display:none;">
                 <img id="winner-ketua-img" src="" class="winner-photo">
-                <h2 id="winner-ketua-nama" class="fw-bold">—</h2>
-                <h4 class="text-warning mt-2"><span id="winner-ketua-votes">0</span> Suara (<span id="winner-ketua-pct">0</span>%)</h4>
+                <h3 id="winner-ketua-nama" class="fw-bold text-dark">—</h3>
+                <h5 class="text-ketua mt-2 fw-bold"><span id="winner-ketua-votes">0</span> Suara (<span id="winner-ketua-pct">0</span>%)</h5>
             </div>
+            
             <div id="wakil-reveal-area" style="display:none; width:100%;" class="mt-5 d-flex flex-column align-items-center">
-                <h2 class="fw-bold text-info mb-4" style="text-shadow:0 0 20px rgba(33,150,243,0.5); font-weight:900;">⭐ WAKIL KETUA TERPILIH ⭐</h2>
+                <h2 class="fw-black text-wakil mb-4">⭐ WAKIL KETUA TERPILIH ⭐</h2>
                 <div id="winner-wakil-card" class="winner-card wakil bounce-in" style="display:none;">
                     <img id="winner-wakil-img" src="" class="winner-photo">
-                    <h3 id="winner-wakil-nama" class="fw-bold">—</h3>
-                    <h5 class="text-info mt-2"><span id="winner-wakil-votes">0</span> Suara (<span id="winner-wakil-pct">0</span>%)</h5>
+                    <h4 id="winner-wakil-nama" class="fw-bold text-dark">—</h4>
+                    <h6 class="text-wakil mt-2 fw-bold"><span id="winner-wakil-votes">0</span> Suara (<span id="winner-wakil-pct">0</span>%)</h6>
                 </div>
             </div>
-            <div id="result-stats" class="glassmorphism p-4 mt-5 w-100" style="max-width:800px; display:none;">
-                <h3 class="text-center fw-bold mb-4">Statistik Pemungutan Suara</h3>
-                <p class="text-center mb-4">Total Suara Masuk: <span id="stat-total-votes" class="fw-bold text-warning">0</span></p>
+            
+            <div id="result-stats" class="clean-card p-4 mt-5 w-100 shadow-sm" style="max-width:800px; display:none;">
+                <h4 class="text-center fw-bold mb-4">Statistik Pemungutan Suara</h4>
+                <p class="text-center mb-4 fw-medium">Total Suara Masuk: <span id="stat-total-votes" class="fw-bold text-primary">0</span></p>
                 <div class="row">
-                    <div class="col-md-6 mb-4"><h5 class="text-warning border-bottom pb-2">Perolehan Ketua</h5><div id="stats-chart-ketua"></div></div>
-                    <div class="col-md-6 mb-4"><h5 class="text-info border-bottom pb-2">Perolehan Wakil Ketua</h5><div id="stats-chart-wakil"></div></div>
+                    <div class="col-md-6 mb-4">
+                        <h6 class="text-ketua fw-bold border-bottom pb-2 mb-3">Perolehan Ketua</h6>
+                        <div id="stats-chart-ketua"></div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <h6 class="text-wakil fw-bold border-bottom pb-2 mb-3">Perolehan Wakil Ketua</h6>
+                        <div id="stats-chart-wakil"></div>
+                    </div>
                 </div>
             </div>
-            <div class="mt-5 text-center text-white-50 pb-5" id="result-footer" style="display:none;">
+            
+            <div class="mt-5 text-center text-muted pb-5" id="result-footer" style="display:none;">
                 <p>Vocational Tax Corner &mdash; Periode 2026/2027</p>
             </div>
         </div>
@@ -227,112 +327,130 @@
 
     <!-- ============ SCREEN 9: ADMIN LOGIN ============ -->
     <div id="screen-admin-login" class="screen">
-        <div class="glassmorphism p-5 text-center" style="max-width:400px; width:90%;">
-            <i class="fa-solid fa-lock fs-1 text-white-50 mb-3"></i>
-            <h2 class="fw-bold mb-4">Admin Panel</h2>
-            <input type="text" id="admin-user" class="form-control mb-3 py-2" placeholder="Username">
-            <input type="password" id="admin-pass" class="form-control mb-4 py-2" placeholder="Password">
-            <button class="btn-kahoot btn-kahoot-blue w-100" onclick="handleAdminLogin()">LOGIN</button>
+        <div class="clean-card p-5 text-center" style="max-width:400px; width:90%;">
+            <i class="fa-solid fa-lock fs-1 text-primary mb-3"></i>
+            <h3 class="fw-bold mb-4">Admin Panel</h3>
+            <input type="text" id="admin-user" class="form-control mb-3 py-2 text-center bg-light" placeholder="Username">
+            <input type="password" id="admin-pass" class="form-control mb-4 py-2 text-center bg-light" placeholder="Password">
+            <button class="btn-clean w-100" onclick="handleAdminLogin()">LOGIN</button>
             <br>
-            <a href="#" class="mt-4 d-inline-block text-white-50 text-decoration-none" onclick="showScreen('screen-landing')">&larr; Kembali ke Pemilih</a>
+            <a href="#" class="mt-4 d-inline-block text-muted text-decoration-none" onclick="showScreen('screen-landing')">&larr; Kembali ke Pemilih</a>
         </div>
     </div>
 
     <!-- ============ SCREEN 10: ADMIN DASHBOARD ============ -->
     <div id="screen-admin" class="screen screen-top">
-        <div class="w-100 px-3 px-md-4 d-flex flex-wrap justify-content-between align-items-center mb-4 glassmorphism py-3">
+        <div class="w-100 px-3 px-md-4 d-flex flex-wrap justify-content-between align-items-center mb-4 clean-card py-3">
             <div class="d-flex align-items-center mb-2 mb-md-0">
                 <img src="https://lh3.googleusercontent.com/d/1jqh2mardOYDJP5PPns9-DwxGWIobMX4K" alt="Logo" style="height:40px; margin-right:15px; border-radius:50%;">
-                <h4 class="m-0 fw-bold">Admin Dashboard</h4>
+                <h5 class="m-0 fw-bold">Admin Dashboard</h5>
             </div>
-            <div class="d-flex align-items-center gap-2">
-                <span class="badge bg-secondary fs-6" id="admin-badge-status">Memuat...</span>
-                <button class="btn btn-danger btn-sm rounded-pill px-3" onclick="logoutAdmin()"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+            <div class="d-flex align-items-center gap-3">
+                <span class="badge bg-secondary px-3 py-2" id="admin-badge-status">Memuat...</span>
+                <button class="btn btn-outline-danger btn-sm rounded-pill px-3 fw-bold" onclick="logoutAdmin()"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
             </div>
         </div>
+        
         <ul class="nav nav-pills admin-nav mb-4 flex-wrap justify-content-center" id="adminTabs" role="tablist">
             <li class="nav-item" role="presentation"><button class="nav-link active" data-bs-toggle="pill" data-bs-target="#content-kandidat" type="button" role="tab">Kandidat</button></li>
             <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#content-anggota" type="button" role="tab">Anggota</button></li>
             <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#content-sesi" type="button" role="tab">Sesi Voting</button></li>
             <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#content-monitor" type="button" role="tab" onclick="startAdminMonitor()">Monitor</button></li>
         </ul>
-        <div class="tab-content admin-content" id="adminTabsContent">
+        
+        <div class="tab-content clean-card admin-content" id="adminTabsContent">
             <!-- TAB KANDIDAT -->
             <div class="tab-pane fade show active" id="content-kandidat" role="tabpanel">
                 <div class="row">
                     <div class="col-md-6 mb-4">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h4 class="m-0 text-warning"><i class="fa-solid fa-crown me-1"></i>Calon Ketua</h4>
-                            <button class="btn btn-sm btn-success rounded-pill px-3" onclick="modalAddKandidat('ketua')"><i class="fa-solid fa-plus"></i> Tambah</button>
+                        <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+                            <h5 class="m-0 text-ketua fw-bold"><i class="fa-solid fa-crown me-2"></i>Calon Ketua</h5>
+                            <button class="btn btn-sm btn-primary rounded-pill px-3" onclick="modalAddKandidat('ketua')"><i class="fa-solid fa-plus"></i> Tambah</button>
                         </div>
                         <div id="admin-list-ketua" class="d-flex flex-column gap-2"></div>
                     </div>
                     <div class="col-md-6 mb-4">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h4 class="m-0 text-info"><i class="fa-solid fa-star me-1"></i>Calon Wakil Ketua</h4>
-                            <button class="btn btn-sm btn-success rounded-pill px-3" onclick="modalAddKandidat('wakil')"><i class="fa-solid fa-plus"></i> Tambah</button>
+                        <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+                            <h5 class="m-0 text-wakil fw-bold"><i class="fa-solid fa-star me-2"></i>Calon Wakil Ketua</h5>
+                            <button class="btn btn-sm btn-primary rounded-pill px-3" onclick="modalAddKandidat('wakil')"><i class="fa-solid fa-plus"></i> Tambah</button>
                         </div>
                         <div id="admin-list-wakil" class="d-flex flex-column gap-2"></div>
                     </div>
                 </div>
             </div>
+            
             <!-- TAB ANGGOTA -->
             <div class="tab-pane fade" id="content-anggota" role="tabpanel">
                 <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
-                    <h4 class="m-0" id="admin-anggota-count">Total: 0 anggota</h4>
+                    <h5 class="m-0 fw-bold" id="admin-anggota-count">Total: 0 anggota</h5>
                     <div>
-                        <button class="btn btn-sm btn-outline-light rounded-pill px-3 me-2" onclick="modalAddAnggotaBulk()"><i class="fa-solid fa-list"></i> Bulk Add</button>
-                        <button class="btn btn-sm btn-success rounded-pill px-3" onclick="modalAddAnggota()"><i class="fa-solid fa-plus"></i> Tambah</button>
+                        <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 me-2" onclick="modalAddAnggotaBulk()"><i class="fa-solid fa-list"></i> Bulk Add</button>
+                        <button class="btn btn-sm btn-primary rounded-pill px-3" onclick="modalAddAnggota()"><i class="fa-solid fa-plus"></i> Tambah</button>
                     </div>
                 </div>
-                <div class="table-responsive" style="max-height:400px; overflow-y:auto;">
-                    <table class="table table-dark-glass table-hover">
-                        <thead><tr><th>#</th><th>Nama Anggota</th><th>Status Vote</th><th class="text-end">Aksi</th></tr></thead>
+                <div class="table-responsive" style="max-height:450px; overflow-y:auto;">
+                    <table class="table table-hover align-middle table-clean">
+                        <thead class="bg-light sticky-top"><tr><th>#</th><th>Nama Anggota</th><th>Status Vote</th><th class="text-end">Aksi</th></tr></thead>
                         <tbody id="admin-list-anggota"></tbody>
                     </table>
                 </div>
             </div>
+            
             <!-- TAB SESI -->
             <div class="tab-pane fade" id="content-sesi" role="tabpanel">
                 <div class="row">
                     <div class="col-md-6 mb-4">
-                        <h4 class="mb-3 border-bottom pb-2">Kontrol Sesi</h4>
-                        <div class="glassmorphism p-4 text-center">
-                            <h2 id="admin-session-status-text" class="mb-4">Status: —</h2>
-                            <div class="mb-4 text-start"><label class="form-label">Durasi Voting (Detik)</label><input type="number" id="admin-duration" class="form-control" value="420"></div>
+                        <h5 class="mb-3 border-bottom pb-2 fw-bold">Kontrol Sesi</h5>
+                        <div class="bg-light rounded p-4 text-center border">
+                            <h3 id="admin-session-status-text" class="mb-4 fw-bold">Status: —</h3>
+                            <div class="mb-4 text-start">
+                                <label class="form-label text-muted fw-bold">Durasi Voting (Detik)</label>
+                                <input type="number" id="admin-duration" class="form-control bg-white" value="420">
+                            </div>
                             <div class="d-flex flex-column gap-2">
-                                <button id="btn-admin-start" class="btn btn-success py-2 fw-bold" onclick="adminStartSession()"><i class="fa-solid fa-rocket me-1"></i>🚀 Mulai Voting</button>
-                                <button id="btn-admin-stop" class="btn btn-danger py-2 fw-bold" style="display:none;" onclick="adminStopSession()"><i class="fa-solid fa-stop me-1"></i>⏹ Hentikan</button>
-                                <button id="btn-admin-reset" class="btn btn-warning py-2 fw-bold" style="display:none;" onclick="adminResetSession()"><i class="fa-solid fa-rotate-left me-1"></i>🔄 Reset Sesi</button>
+                                <button id="btn-admin-start" class="btn btn-success py-2 fw-bold" onclick="adminStartSession()"><i class="fa-solid fa-rocket me-2"></i>Mulai Voting</button>
+                                <button id="btn-admin-stop" class="btn btn-danger py-2 fw-bold" style="display:none;" onclick="adminStopSession()"><i class="fa-solid fa-stop me-2"></i>Hentikan</button>
+                                <button id="btn-admin-reset" class="btn btn-warning py-2 fw-bold text-dark" style="display:none;" onclick="adminResetSession()"><i class="fa-solid fa-rotate-left me-2"></i>Reset Sesi</button>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-6 mb-4">
-                        <h4 class="mb-3 border-bottom pb-2">Pengaturan Lokasi</h4>
-                        <div class="glassmorphism p-4">
-                            <div class="mb-3"><button class="btn btn-sm btn-outline-info mb-2" onclick="adminGetLocation()"><i class="fa-solid fa-location-crosshairs me-1"></i>📍 Ambil Lokasi Saya</button></div>
+                        <h5 class="mb-3 border-bottom pb-2 fw-bold">Pengaturan Lokasi</h5>
+                        <div class="bg-light rounded p-4 border">
+                            <div class="mb-3"><button class="btn btn-sm btn-outline-primary mb-2" onclick="adminGetLocation()"><i class="fa-solid fa-location-crosshairs me-1"></i> Ambil Lokasi Saya</button></div>
                             <div class="row">
-                                <div class="col-6 mb-3"><label class="form-label">Latitude</label><input type="text" id="admin-lat" class="form-control"></div>
-                                <div class="col-6 mb-3"><label class="form-label">Longitude</label><input type="text" id="admin-lng" class="form-control"></div>
+                                <div class="col-6 mb-3"><label class="form-label text-muted fw-bold">Latitude</label><input type="text" id="admin-lat" class="form-control bg-white"></div>
+                                <div class="col-6 mb-3"><label class="form-label text-muted fw-bold">Longitude</label><input type="text" id="admin-lng" class="form-control bg-white"></div>
                             </div>
-                            <div class="mb-4"><label class="form-label">Radius (Meter)</label><input type="number" id="admin-radius" class="form-control" value="100"></div>
-                            <button class="btn btn-primary w-100" onclick="saveLocationSettings()">Simpan Lokasi</button>
+                            <div class="mb-4"><label class="form-label text-muted fw-bold">Radius (Meter)</label><input type="number" id="admin-radius" class="form-control bg-white" value="100"></div>
+                            <button class="btn btn-primary w-100 fw-bold" onclick="saveLocationSettings()">Simpan Lokasi</button>
                         </div>
                     </div>
                 </div>
             </div>
+            
             <!-- TAB MONITOR -->
             <div class="tab-pane fade" id="content-monitor" role="tabpanel">
-                <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
-                    <h4 class="m-0">Monitor Live</h4>
-                    <span class="badge bg-primary fs-6" id="monitor-progress-text">0 / 0 Suara</span>
+                <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2 border-bottom pb-2">
+                    <h5 class="m-0 fw-bold">Monitor Live</h5>
+                    <span class="badge bg-primary px-3 py-2" id="monitor-progress-text">0 / 0 Suara</span>
                 </div>
-                <div class="progress mb-4" style="height:10px; background:rgba(255,255,255,0.1);">
+                <div class="progress mb-4 bg-light border" style="height:12px;">
                     <div id="monitor-progress-bar" class="progress-bar bg-success" role="progressbar" style="width:0%;"></div>
                 </div>
                 <div class="row">
-                    <div class="col-md-6 mb-4"><div class="glassmorphism p-3"><h5 class="text-warning">Perolehan Ketua</h5><div id="monitor-chart-ketua"></div></div></div>
-                    <div class="col-md-6 mb-4"><div class="glassmorphism p-3"><h5 class="text-info">Perolehan Wakil</h5><div id="monitor-chart-wakil"></div></div></div>
+                    <div class="col-md-6 mb-4">
+                        <div class="bg-light p-4 rounded border">
+                            <h6 class="text-ketua fw-bold mb-3">Perolehan Ketua</h6>
+                            <div id="monitor-chart-ketua"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <div class="bg-light p-4 rounded border">
+                            <h6 class="text-wakil fw-bold mb-3">Perolehan Wakil</h6>
+                            <div id="monitor-chart-wakil"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -360,7 +478,7 @@
         let adminMonitorInterval = null;
 
         // ====================================================
-        // API HELPER (synced with Code.gs)
+        // API HELPER
         // ====================================================
         async function fetchAPI(action, params = {}) {
             const payload = { action, ...params };
@@ -414,16 +532,25 @@
         function updateCountdownDisplay(sec) {
             const min=Math.floor(sec/60); const s=sec%60;
             const text = `${String(min).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-            ['timer-ketua','timer-wakil'].forEach(id => {
-                const el=document.getElementById(id); if(!el) return;
-                el.innerText=text; el.className='timer-text';
-                if(sec<=30) el.classList.add('timer-danger');
-                else if(sec<=60) el.classList.add('timer-warning');
+            
+            ['ketua','wakil'].forEach(type => {
+                const textEl = document.getElementById(`timer-${type}`);
+                const barEl = document.getElementById(`top-bar-${type}`);
+                if(!textEl || !barEl) return;
+                
+                textEl.innerText = text;
+                textEl.className = 'timer-text';
+                barEl.className = 'timer-bar';
+                
+                if(sec <= 30) {
+                    textEl.classList.add('timer-danger');
+                    barEl.classList.add('bg-danger-light');
+                } else if(sec <= 60) {
+                    textEl.classList.add('timer-warning');
+                }
             });
-            if(sec<=30) document.body.classList.add('bg-pulse-red'); else document.body.classList.remove('bg-pulse-red');
         }
         function handleTimeUp() {
-            document.body.classList.remove('bg-pulse-red');
             Swal.fire('Waktu Habis!','Waktu voting telah selesai.','warning').then(()=>{ if(selectedKetua&&selectedWakil) submitVote(true); else { showScreen('screen-done'); waitForResults(); }});
         }
 
@@ -455,7 +582,7 @@
 
         function checkLocation() {
             const btn=document.getElementById('btn-loc-retry'); const txt=document.getElementById('loc-status-text'); const sub=document.getElementById('loc-subtext');
-            btn.style.display='none'; txt.innerText='📍 Memeriksa Lokasi Anda...'; txt.className='fw-bold mb-3';
+            btn.style.display='none'; txt.innerText='📍 Memeriksa Lokasi...'; txt.className='fw-bold mb-3';
             if(!navigator.geolocation) { txt.innerText='❌ Geolocation tidak didukung'; txt.className='fw-bold mb-3 text-danger'; btn.style.display='block'; return; }
             navigator.geolocation.getCurrentPosition(
                 pos => {
@@ -509,7 +636,7 @@
         // ====================================================
         function renderCandidateCards(containerId, data, type) {
             const container = document.getElementById(containerId); container.innerHTML = '';
-            if(!data || data.length===0) { container.innerHTML='<div class="text-center text-white-50 py-4">Belum ada kandidat.</div>'; return; }
+            if(!data || data.length===0) { container.innerHTML='<div class="text-center text-muted py-4">Belum ada kandidat.</div>'; return; }
             data.forEach(k => {
                 const defaultImg = `https://ui-avatars.com/api/?name=${encodeURIComponent(k.nama)}&background=random&color=fff&size=200&bold=true`;
                 const fotoSrc = k.foto || defaultImg;
@@ -519,9 +646,9 @@
                 card.innerHTML = `
                     <i class="fa-solid fa-circle-check check-overlay"></i>
                     <img src="${fotoSrc}" class="candidate-img" onerror="this.src='${defaultImg}'">
-                    <h3 class="fw-bold">${k.nama}</h3>
-                    <div class="mt-2"><button class="btn btn-sm btn-outline-light" onclick="event.stopPropagation(); toggleVisiMisi('${type}-${k.id||k.nama}')">Visi & Misi <i class="fa-solid fa-chevron-down"></i></button></div>
-                    <div id="visimisi-${type}-${k.id||k.nama}" class="visi-misi"><strong>Visi:</strong><br>${k.visi||'-'}<br><br><strong>Misi:</strong><br>${k.misi||'-'}</div>`;
+                    <h4 class="fw-bold text-dark">${k.nama}</h4>
+                    <div class="mt-3"><button class="btn btn-sm btn-outline-secondary rounded-pill" onclick="event.stopPropagation(); toggleVisiMisi('${type}-${k.id||k.nama}')">Visi & Misi <i class="fa-solid fa-chevron-down ms-1"></i></button></div>
+                    <div id="visimisi-${type}-${k.id||k.nama}" class="visi-misi mt-2"><strong>Visi:</strong><br>${k.visi||'-'}<br><br><strong>Misi:</strong><br>${k.misi||'-'}</div>`;
                 container.appendChild(card);
             });
         }
@@ -550,14 +677,12 @@
 
         async function submitVote(isAuto=false) {
             showLoading('Mengirim suara...');
-            // Backend expects candidate NAMES (bukan ID)
             const res = await fetchAPI('submitVote', {
                 nama: currentVoterName,
                 pilihanKetua: selectedKetua ? selectedKetua.nama : '',
                 pilihanWakil: selectedWakil ? selectedWakil.nama : ''
             });
             closeLoading();
-            document.body.classList.remove('bg-pulse-red');
             if(localCountdownInterval) clearInterval(localCountdownInterval);
             if(res.status) { showScreen('screen-done'); waitForResults(); }
             else { Swal.fire('Error', res.message || 'Gagal mengirim suara', 'error'); }
@@ -600,10 +725,10 @@
             }
 
             document.getElementById('stat-total-votes').innerText = total;
-            renderBarChart('stats-chart-ketua', results.calonKetua, total);
-            renderBarChart('stats-chart-wakil', results.calonWakil, total);
+            renderBarChart('stats-chart-ketua', results.calonKetua, total, '#d97706'); // warning
+            renderBarChart('stats-chart-wakil', results.calonWakil, total, '#2563eb'); // primary
 
-            // DRAMATIC REVEAL SEQUENCE
+            // REVEAL SEQUENCE
             showScreen('screen-result');
             const titleMain = document.getElementById('result-title-main');
             setTimeout(() => { titleMain.style.opacity = '1'; }, 100);
@@ -612,11 +737,11 @@
                 const p2 = document.getElementById('result-phase-2');
                 p2.style.display = 'flex'; setTimeout(() => { p2.style.opacity = '1'; }, 50);
                 document.getElementById('winner-ketua-card').style.display = 'block';
-                fireConfetti(['#ffc107','#ff5722','#e91e63']);
+                fireConfetti(['#d97706','#f59e0b','#fcd34d']);
                 setTimeout(() => {
                     document.getElementById('wakil-reveal-area').style.display = 'flex';
                     document.getElementById('winner-wakil-card').style.display = 'block';
-                    fireConfetti(['#2196f3','#9c27b0','#4caf50']);
+                    fireConfetti(['#2563eb','#60a5fa','#3b82f6']);
                     setTimeout(() => {
                         document.getElementById('result-stats').style.display = 'block';
                         document.getElementById('result-footer').style.display = 'block';
@@ -626,15 +751,13 @@
             }, 3000);
         }
 
-        function renderBarChart(containerId, candidateResults, totalVotes) {
+        function renderBarChart(containerId, candidateResults, totalVotes, colorBase) {
             const container = document.getElementById(containerId); container.innerHTML = '';
-            if(!candidateResults || candidateResults.length===0) { container.innerHTML='<p class="text-white-50">Tidak ada data.</p>'; return; }
+            if(!candidateResults || candidateResults.length===0) { container.innerHTML='<p class="text-muted">Tidak ada data.</p>'; return; }
             let html = '';
             candidateResults.forEach(c => {
                 const pct = totalVotes > 0 ? (c.voteCount/totalVotes)*100 : 0;
-                const colors = ['#2196f3','#e91e63','#ffc107','#4caf50','#ff5722','#9c27b0'];
-                const color = colors[Math.floor(Math.random()*colors.length)];
-                html += `<div class="bar-chart-row"><div class="bar-chart-label" title="${c.nama}">${c.nama}</div><div class="bar-chart-bar-wrap"><div class="bar-chart-bar" style="width:0%; background:${color};" data-target="${pct}%"></div></div><div class="bar-chart-count">${c.voteCount}</div></div>`;
+                html += `<div class="bar-chart-row"><div class="bar-chart-label" title="${c.nama}">${c.nama}</div><div class="bar-chart-bar-wrap"><div class="bar-chart-bar" style="width:0%; background:${colorBase};" data-target="${pct}%"></div></div><div class="bar-chart-count">${c.voteCount}</div></div>`;
             });
             container.innerHTML = html;
             setTimeout(() => { container.querySelectorAll('.bar-chart-bar').forEach(bar => { bar.style.width = bar.getAttribute('data-target'); }); }, 500);
@@ -649,7 +772,7 @@
             })();
         }
         function startContinuousConfetti() {
-            const duration=15000; const end=Date.now()+duration; const colors=['#ffc107','#ff5722','#e91e63','#2196f3','#4caf50'];
+            const duration=15000; const end=Date.now()+duration; const colors=['#d97706','#2563eb','#16a34a','#dc2626','#f59e0b'];
             (function frame(){
                 confetti({particleCount:2,angle:60,spread:55,origin:{x:0},colors,zIndex:9999});
                 confetti({particleCount:2,angle:120,spread:55,origin:{x:1},colors,zIndex:9999});
@@ -681,23 +804,21 @@
             closeLoading();
             if(!res.status || !res.data) { showToast('error','Gagal memuat data'); return; }
             const data = res.data;
-            // Candidates
+            
             renderAdminCandidates('admin-list-ketua', data.calonKetua || [], 'ketua');
             renderAdminCandidates('admin-list-wakil', data.calonWakil || [], 'wakil');
-            // Members
             renderAdminMembers(data.members || [], data.votes || []);
-            // Session
             updateAdminSessionUI(data);
         }
 
         function renderAdminCandidates(containerId, list, type) {
             const c = document.getElementById(containerId); c.innerHTML = '';
-            if(list.length===0) { c.innerHTML='<div class="text-white-50 text-center py-3">Belum ada kandidat</div>'; return; }
+            if(list.length===0) { c.innerHTML='<div class="text-muted text-center py-3">Belum ada kandidat</div>'; return; }
             list.forEach(k => {
                 const defImg = `https://ui-avatars.com/api/?name=${encodeURIComponent(k.nama)}&background=random&color=fff&size=50`;
-                c.innerHTML += `<div class="glassmorphism p-2 d-flex justify-content-between align-items-center">
-                    <div class="d-flex align-items-center"><img src="${k.foto||defImg}" class="candidate-img-sm me-2" onerror="this.src='${defImg}'"><span class="fw-bold">${k.nama}</span></div>
-                    <button class="btn btn-sm btn-outline-danger rounded-pill" onclick="deleteCandidate('${type}','${k.id}')"><i class="fa-solid fa-trash"></i></button>
+                c.innerHTML += `<div class="bg-light border rounded p-2 mb-2 d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center"><img src="${k.foto||defImg}" class="candidate-img-sm me-3" onerror="this.src='${defImg}'"><span class="fw-bold text-dark">${k.nama}</span></div>
+                    <button class="btn btn-sm btn-outline-danger rounded-circle p-2 lh-1" onclick="deleteCandidate('${type}','${k.id}')"><i class="fa-solid fa-trash"></i></button>
                 </div>`;
             });
         }
@@ -710,8 +831,8 @@
             members.forEach((m, i) => {
                 const nama = m.nama || m;
                 const hasVoted = votedNames.includes(nama.toLowerCase());
-                const badge = hasVoted ? '<span class="badge bg-success">Sudah Vote</span>' : '<span class="badge bg-secondary">Belum</span>';
-                c.innerHTML += `<tr><td>${i+1}</td><td>${nama}</td><td>${badge}</td><td class="text-end"><button class="btn btn-sm btn-danger rounded-pill" onclick="deleteMember('${nama.replace(/'/g,"\\'")}')"><i class="fa-solid fa-trash"></i></button></td></tr>`;
+                const badge = hasVoted ? '<span class="badge bg-success rounded-pill px-3 py-1">Sudah Vote</span>' : '<span class="badge bg-secondary rounded-pill px-3 py-1">Belum</span>';
+                c.innerHTML += `<tr><td class="text-muted fw-bold">${i+1}</td><td class="fw-medium text-dark">${nama}</td><td>${badge}</td><td class="text-end"><button class="btn btn-sm btn-outline-danger" onclick="deleteMember('${nama.replace(/'/g,"\\'")}')"><i class="fa-solid fa-trash"></i></button></td></tr>`;
             });
         }
 
@@ -731,9 +852,9 @@
             btnStop.style.display = status==='active' ? 'block' : 'none';
             btnReset.style.display = status==='finished' ? 'block' : 'none';
 
-            if(status==='inactive') badge.className='badge bg-secondary fs-6';
-            else if(status==='active') badge.className='badge bg-success fs-6';
-            else if(status==='finished') badge.className='badge bg-primary fs-6';
+            if(status==='inactive') badge.className='badge bg-secondary px-3 py-2';
+            else if(status==='active') badge.className='badge bg-success px-3 py-2';
+            else if(status==='finished') badge.className='badge bg-primary px-3 py-2';
 
             document.getElementById('admin-lat').value = sess.centerLat || '';
             document.getElementById('admin-lng').value = sess.centerLng || '';
@@ -767,7 +888,7 @@
             });
         }
         async function deleteCandidate(type, id) {
-            const conf = await Swal.fire({title:'Hapus kandidat ini?', icon:'warning', showCancelButton:true, confirmButtonColor:'#e74c3c', confirmButtonText:'Ya, Hapus!', cancelButtonText:'Batal'});
+            const conf = await Swal.fire({title:'Hapus kandidat ini?', icon:'warning', showCancelButton:true, confirmButtonColor:'#dc2626', confirmButtonText:'Ya, Hapus!', cancelButtonText:'Batal'});
             if(conf.isConfirmed) { showLoading('Menghapus...'); await fetchAPI('deleteCandidate', {type, id}); closeLoading(); showToast('success','Kandidat dihapus'); fetchAdminData(); }
         }
 
@@ -793,7 +914,7 @@
             });
         }
         async function deleteMember(nama) {
-            const conf = await Swal.fire({title:`Hapus ${nama}?`, icon:'warning', showCancelButton:true, confirmButtonColor:'#e74c3c', confirmButtonText:'Ya, Hapus!', cancelButtonText:'Batal'});
+            const conf = await Swal.fire({title:`Hapus ${nama}?`, icon:'warning', showCancelButton:true, confirmButtonColor:'#dc2626', confirmButtonText:'Ya, Hapus!', cancelButtonText:'Batal'});
             if(conf.isConfirmed) { showLoading('Menghapus...'); await fetchAPI('deleteMember', {nama}); closeLoading(); showToast('success','Anggota dihapus'); fetchAdminData(); }
         }
 
@@ -807,11 +928,11 @@
             closeLoading(); showToast('success','Sesi voting dimulai!'); fetchAdminData();
         }
         async function adminStopSession() {
-            const conf = await Swal.fire({title:'Hentikan voting?', text:'Sesi akan ditutup dan hasil ditampilkan.', icon:'warning', showCancelButton:true, confirmButtonText:'Ya, Hentikan!', cancelButtonText:'Batal'});
+            const conf = await Swal.fire({title:'Hentikan voting?', text:'Sesi akan ditutup dan hasil ditampilkan.', icon:'warning', showCancelButton:true, confirmButtonText:'Ya, Hentikan!', cancelButtonText:'Batal', confirmButtonColor:'#dc2626'});
             if(conf.isConfirmed) { showLoading('Menghentikan...'); await fetchAPI('stopSession'); closeLoading(); showToast('success','Sesi dihentikan'); fetchAdminData(); }
         }
         async function adminResetSession() {
-            const conf = await Swal.fire({title:'Reset sesi?', text:'Semua data voting akan dihapus!', icon:'warning', showCancelButton:true, confirmButtonColor:'#e74c3c', confirmButtonText:'Ya, Reset!', cancelButtonText:'Batal'});
+            const conf = await Swal.fire({title:'Reset sesi?', text:'Semua data voting akan dihapus!', icon:'warning', showCancelButton:true, confirmButtonColor:'#dc2626', confirmButtonText:'Ya, Reset!', cancelButtonText:'Batal'});
             if(conf.isConfirmed) { showLoading('Mereset...'); await fetchAPI('resetSession'); closeLoading(); showToast('success','Sesi direset'); fetchAdminData(); }
         }
 
@@ -848,8 +969,8 @@
             const pct = totalAnggota > 0 ? (totalMasuk/totalAnggota)*100 : 0;
             document.getElementById('monitor-progress-text').innerText = `${totalMasuk} / ${totalAnggota} Suara Masuk`;
             document.getElementById('monitor-progress-bar').style.width = `${pct}%`;
-            renderBarChart('monitor-chart-ketua', results.calonKetua || [], totalMasuk);
-            renderBarChart('monitor-chart-wakil', results.calonWakil || [], totalMasuk);
+            renderBarChart('monitor-chart-ketua', results.calonKetua || [], totalMasuk, '#d97706');
+            renderBarChart('monitor-chart-wakil', results.calonWakil || [], totalMasuk, '#2563eb');
             // Update session status badge too
             updateAdminSessionUI(data);
         }
