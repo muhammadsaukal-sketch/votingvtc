@@ -1,995 +1,920 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VTC Voting 2026/2027</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VTC Voting 2026/2027</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<style>
+:root{
+  --bg:#f9fafb;
+  --white:#fff;
+  --border:#e5e7eb;
+  --border-dark:#d1d5db;
+  --text:#111827;
+  --text-2:#374151;
+  --text-3:#6b7280;
+  --text-4:#9ca3af;
+  --blue:#2563eb;
+  --blue-hover:#1d4ed8;
+  --blue-light:#eff6ff;
+  --green:#059669;
+  --green-light:#ecfdf5;
+  --red:#dc2626;
+  --red-light:#fef2f2;
+  --amber:#d97706;
+  --radius:10px;
+  --radius-lg:14px;
+  --shadow:0 1px 3px rgba(0,0,0,.08);
+  --shadow-md:0 4px 12px rgba(0,0,0,.08);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased}
 
-    <style>
-        :root {
-            --primary: #2563eb;
-            --primary-hover: #1d4ed8;
-            --secondary: #64748b;
-            --success: #16a34a;
-            --danger: #dc2626;
-            --warning: #d97706; /* Darker yellow/orange for readability */
-            --bg-color: #f8fafc;
-            --card-bg: #ffffff;
-            --text-main: #0f172a;
-            --text-muted: #64748b;
-            --border-color: #e2e8f0;
-        }
-        
-        body { 
-            font-family: 'Outfit', sans-serif; 
-            background-color: var(--bg-color); 
-            color: var(--text-main); 
-            min-height: 100vh; 
-            margin: 0; 
-            overflow-x: hidden; 
-        }
+/* Screens */
+.screen{display:none;min-height:100vh;flex-direction:column;align-items:center;justify-content:center;padding:24px;width:100%}
+.screen.active{display:flex}
+.screen-top{justify-content:flex-start;padding-top:24px;padding-bottom:120px}
 
-        /* Screen Management */
-        .screen { display:none; opacity:0; transition:opacity 0.3s ease; min-height:100vh; flex-direction:column; align-items:center; justify-content:center; width:100%; padding:20px; }
-        .screen.active { display:flex; opacity:1; }
-        .screen-top { justify-content:flex-start; padding-top:2rem; padding-bottom:6rem; }
+/* Card */
+.card-c{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow)}
 
-        /* Clean Card UI */
-        .clean-card { 
-            background: var(--card-bg); 
-            border: 1px solid var(--border-color); 
-            border-radius: 16px; 
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03); 
-        }
+/* Buttons */
+.btn-c{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-family:inherit;font-weight:600;border:none;border-radius:var(--radius);padding:13px 28px;font-size:.95rem;cursor:pointer;transition:background .15s,box-shadow .15s}
+.btn-c:disabled{opacity:.45;cursor:not-allowed}
+.btn-blue{background:var(--blue);color:#fff}.btn-blue:hover:not(:disabled){background:var(--blue-hover)}
+.btn-green{background:var(--green);color:#fff}.btn-green:hover:not(:disabled){background:#047857}
+.btn-red{background:var(--red);color:#fff}.btn-red:hover:not(:disabled){background:#b91c1c}
+.btn-outline{background:transparent;color:var(--text-2);border:1px solid var(--border-dark);border-radius:var(--radius);padding:11px 22px;font-weight:500;cursor:pointer;transition:background .15s}.btn-outline:hover{background:#f3f4f6}
 
-        /* Buttons */
-        .btn-clean { 
-            background: var(--primary); 
-            color: white; 
-            font-weight: 600; 
-            border: none; 
-            border-radius: 10px; 
-            padding: 14px 28px; 
-            transition: all 0.2s ease; 
-            cursor: pointer; 
-            box-shadow: 0 2px 4px rgba(37,99,235,0.2); 
-            text-transform: uppercase; 
-            letter-spacing: 0.5px;
-        }
-        .btn-clean:hover { background: var(--primary-hover); transform: translateY(-1px); box-shadow: 0 4px 6px rgba(37,99,235,0.3); color: white; }
-        .btn-clean:active { transform: translateY(1px); box-shadow: none; }
-        .btn-clean:disabled { background: #cbd5e1; cursor: not-allowed; box-shadow: none; transform: none; color: #94a3b8; }
-        
-        .btn-green { background: var(--success); box-shadow: 0 2px 4px rgba(22,163,74,0.2); }
-        .btn-green:hover { background: #15803d; box-shadow: 0 4px 6px rgba(22,163,74,0.3); }
+/* Input */
+.input-c{width:100%;max-width:360px;padding:13px 16px;border:1px solid var(--border-dark);border-radius:var(--radius);font-size:1.05rem;font-family:inherit;text-align:center;color:var(--text);transition:border-color .15s}
+.input-c:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
 
-        .btn-outline-clean {
-            background: transparent;
-            color: var(--text-main);
-            border: 2px solid var(--border-color);
-            font-weight: 600;
-            border-radius: 10px;
-            padding: 12px 24px;
-            transition: all 0.2s;
-        }
-        .btn-outline-clean:hover { background: #f1f5f9; color: var(--text-main); }
+.logo-main{width:100px;margin-bottom:20px}
 
-        /* Inputs */
-        .input-clean { 
-            background: #ffffff; 
-            border: 2px solid var(--border-color); 
-            border-radius: 12px; 
-            padding: 15px; 
-            font-size: 1.2rem; 
-            text-align: center; 
-            font-weight: 500; 
-            color: var(--text-main); 
-            width: 100%; 
-            max-width: 400px; 
-            transition: border-color 0.2s;
-        }
-        .input-clean:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+/* Timer */
+.timer-bar{position:fixed;top:0;left:0;width:100%;background:var(--white);border-bottom:1px solid var(--border);padding:10px 0;text-align:center;z-index:100}
+.timer-text{font-size:1.8rem;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums}
+.timer-text.warn{color:var(--amber)}
+.timer-text.danger{color:var(--red)}
 
-        .logo-main { width: 140px; margin-bottom: 24px; }
+/* Candidate grid */
+.cand-grid{display:grid;grid-template-columns:1fr;gap:20px;width:100%;max-width:900px;padding:16px;margin-top:56px}
+@media(min-width:540px){.cand-grid{grid-template-columns:1fr 1fr}}
+@media(min-width:900px){.cand-grid{grid-template-columns:1fr 1fr 1fr}}
 
-        /* Typography */
-        .text-ketua { color: var(--warning); }
-        .text-wakil { color: var(--primary); }
-        .fw-black { font-weight: 800; }
+.cand-card{background:var(--white);border:2px solid var(--border);border-radius:var(--radius-lg);padding:24px 16px;text-align:center;cursor:pointer;transition:border-color .15s,box-shadow .15s;position:relative}
+.cand-card:hover{border-color:var(--blue);box-shadow:var(--shadow-md)}
+.cand-card.picked{border-color:var(--blue);background:var(--blue-light);box-shadow:0 0 0 2px var(--blue)}
+.cand-card .pick-mark{position:absolute;top:12px;right:12px;width:28px;height:28px;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.85rem;opacity:0;transform:scale(.5);transition:all .2s}
+.cand-card.picked .pick-mark{opacity:1;transform:scale(1)}
 
-        /* Timer Bar */
-        .timer-bar { 
-            position: fixed; top: 0; left: 0; width: 100%; 
-            background: rgba(255, 255, 255, 0.95); 
-            backdrop-filter: blur(8px); 
-            padding: 10px 0; text-align: center; z-index: 100; 
-            border-bottom: 1px solid var(--border-color); 
-            box-shadow: 0 2px 10px rgba(0,0,0,0.03); 
-            transition: background-color 0.3s;
-        }
-        .timer-text { font-size: 2rem; font-weight: 800; color: var(--text-main); transition: color 0.3s; }
-        .timer-warning { color: var(--warning) !important; }
-        .timer-danger { color: var(--danger) !important; }
-        .timer-bar.bg-danger-light { background: #fef2f2; border-color: #fca5a5; }
+.cand-photo{width:100px;height:100px;border-radius:50%;object-fit:cover;border:3px solid var(--bg);margin-bottom:12px}
+.cand-photo-sm{width:40px;height:40px;border-radius:50%;object-fit:cover;border:1px solid var(--border)}
 
-        /* Candidate Grid */
-        .candidate-grid { display:grid; grid-template-columns:1fr; gap:24px; width:100%; max-width:1200px; padding:20px; margin-top:60px; }
-        @media(min-width:577px){ .candidate-grid{grid-template-columns:1fr 1fr;} }
-        @media(min-width:993px){ .candidate-grid{grid-template-columns:1fr 1fr 1fr;} }
+.vm-box{margin-top:12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:left;font-size:.88rem;color:var(--text-2);display:none;line-height:1.5}
 
-        .candidate-card { 
-            background: var(--card-bg); 
-            border: 2px solid var(--border-color); 
-            border-radius: 16px; 
-            padding: 24px; 
-            text-align: center; 
-            cursor: pointer; 
-            transition: all 0.2s ease; 
-            position: relative; 
-        }
-        .candidate-card:hover { border-color: var(--primary); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); transform: translateY(-3px); }
-        .candidate-card.selected { border-color: var(--primary); background: #eff6ff; box-shadow: 0 0 0 2px var(--primary); transform: translateY(-3px); }
-        
-        .candidate-card .check-overlay { position:absolute; top:-40px; right:15px; font-size:2rem; color:var(--primary); transition:all 0.3s cubic-bezier(0.175,0.885,0.32,1.275); opacity:0; }
-        .candidate-card.selected .check-overlay { top:15px; opacity:1; }
-        
-        .candidate-img { width:120px; height:120px; border-radius:50%; object-fit:cover; border:4px solid #fff; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom:15px; }
-        .candidate-img-sm { width:45px; height:45px; border-radius:50%; object-fit:cover; border:1px solid var(--border-color); }
-        
-        .visi-misi { font-size:0.95rem; margin-top:15px; background:#f8fafc; border: 1px solid var(--border-color); border-radius:8px; padding:12px; text-align:left; display:none; color:var(--text-main); }
+/* Winner */
+.winner-wrap{background:var(--white);border:1px solid var(--border);border-radius:20px;padding:36px 28px;text-align:center;max-width:380px;width:100%;box-shadow:var(--shadow-md)}
+.winner-photo{width:130px;height:130px;border-radius:50%;object-fit:cover;border:4px solid var(--bg);margin-bottom:16px;box-shadow:var(--shadow)}
 
-        /* Winner Cards */
-        .winner-card { 
-            background: #fffbeb; border: 2px solid #fcd34d; border-radius: 20px; padding: 30px; text-align: center; max-width: 400px; width: 100%; margin: 20px; box-shadow: 0 10px 25px rgba(245, 158, 11, 0.15); 
-        }
-        .winner-card.wakil { background: #eff6ff; border-color: #bfdbfe; box-shadow: 0 10px 25px rgba(59, 130, 246, 0.15); }
-        .winner-photo { width:150px; height:150px; border-radius:50%; border:5px solid white; object-fit:cover; margin-bottom:15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+/* Bar chart */
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.bar-label{width:110px;font-size:.88rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:left}
+.bar-track{flex:1;height:22px;background:var(--bg);border:1px solid var(--border);border-radius:11px;overflow:hidden}
+.bar-fill{height:100%;border-radius:11px;width:0;transition:width .8s ease-out}
+.bar-count{width:50px;text-align:right;font-weight:700;font-size:.88rem}
 
-        /* Bar Charts */
-        .bar-chart-row { display:flex; align-items:center; margin-bottom:12px; }
-        .bar-chart-label { width:130px; text-align:left; font-size:0.95rem; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; padding-right:10px; }
-        .bar-chart-bar-wrap { flex-grow:1; background:#e2e8f0; height:24px; border-radius:12px; overflow:hidden; }
-        .bar-chart-bar { height:100%; background:var(--primary); width:0%; transition:width 1s ease-out; border-radius:12px; }
-        .bar-chart-count { width:60px; text-align:right; font-size:1rem; font-weight:bold; color:var(--text-main); }
+/* Admin */
+.admin-nav .nav-link{color:var(--text-3);font-weight:500;border-radius:8px;padding:9px 18px;font-size:.9rem}
+.admin-nav .nav-link:hover{background:#f3f4f6;color:var(--text)}
+.admin-nav .nav-link.active{background:var(--blue);color:#fff}
+.admin-body{padding:24px;width:100%;max-width:1100px}
+.tbl-c th{font-size:.8rem;text-transform:uppercase;letter-spacing:.5px;color:var(--text-3);border-bottom-color:var(--border);font-weight:600}
+.tbl-c td{border-bottom-color:var(--border);vertical-align:middle}
 
-        /* Admin UI */
-        .admin-nav .nav-link { color:var(--text-muted); font-weight:500; border-radius:8px; margin:0 5px; padding: 10px 20px; }
-        .admin-nav .nav-link:hover { background:#f1f5f9; color:var(--text-main); }
-        .admin-nav .nav-link.active { background:var(--primary); color:white; }
-        .admin-content { padding:24px; min-height:60vh; width:100%; max-width:1200px; }
-        
-        /* Table Override */
-        .table-clean th { border-bottom-color: var(--border-color); color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.5px; }
-        .table-clean td { border-bottom-color: var(--border-color); vertical-align: middle; }
+/* Location */
+.loc-ring{position:absolute;border:2px solid var(--blue);border-radius:50%;animation:ring 2s infinite ease-out}
+@keyframes ring{0%{width:30px;height:30px;opacity:.8}100%{width:140px;height:140px;opacity:0}}
 
-        /* Animations */
-        @keyframes bounce-scale { 0%{transform:scale(0.8); opacity:0;} 50%{transform:scale(1.05);} 100%{transform:scale(1); opacity:1;} }
-        .bounce-in { animation:bounce-scale 0.5s cubic-bezier(0.175,0.885,0.32,1.275) forwards; }
-        @keyframes pulse-light { 0%{transform:scale(0.95); opacity:0.8;} 50%{transform:scale(1); opacity:1;} 100%{transform:scale(0.95); opacity:0.8;} }
-        .pulsing-light { animation:pulse-light 2s infinite; }
-        @keyframes radar-clean { 0%{transform:scale(0.5);opacity:0.8} 100%{transform:scale(2.5);opacity:0} }
-        .radar-circle { position:absolute; width:80px; height:80px; border:2px solid var(--primary); border-radius:50%; animation:radar-clean 2s infinite ease-out; }
+/* Utility */
+.fade-in{animation:fadeIn .4s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.text-sm{font-size:.88rem}
 
-        @media(max-width:576px) {
-            .timer-text { font-size:1.8rem; }
-            .candidate-img { width:90px; height:90px; }
-            .winner-photo { width:110px; height:110px; }
-            .input-clean { font-size:1.1rem; padding:12px; }
-        }
-    </style>
+@media(max-width:576px){
+  .timer-text{font-size:1.5rem}
+  .cand-photo{width:80px;height:80px}
+  .winner-photo{width:100px;height:100px}
+  .input-c{font-size:1rem;padding:12px}
+}
+</style>
 </head>
 <body>
 
-    <!-- ============ SCREEN 1: LANDING ============ -->
-    <div id="screen-landing" class="screen active">
-        <img src="https://lh3.googleusercontent.com/d/1jqh2mardOYDJP5PPns9-DwxGWIobMX4K" alt="VTC Logo" class="logo-main">
-        <h1 class="text-center mb-2 fw-black" style="font-size:2.2rem; color: var(--text-main);">PEMILIHAN KETUA & WAKIL KETUA</h1>
-        <p class="text-center mb-5 fs-5 text-muted">Vocational Tax Corner &mdash; Periode 2026/2027</p>
-        <div class="clean-card p-4 p-md-5 text-center" style="max-width:500px; width:90%;">
-            <input type="text" id="voter-name" class="input-clean mb-4 d-block mx-auto" placeholder="Masukkan Nama Lengkap" autocomplete="off">
-            <button class="btn-clean w-100 fs-5" onclick="handleVoterEntry()">Masuk Sesi</button>
+<!-- ========== 1. LANDING ========== -->
+<div id="s-landing" class="screen active">
+  <img src="https://lh3.googleusercontent.com/d/1jqh2mardOYDJP5PPns9-DwxGWIobMX4K" alt="Logo" class="logo-main">
+  <h1 style="font-size:1.6rem;font-weight:800;text-align:center;margin-bottom:4px">Pemilihan Ketua &amp; Wakil Ketua</h1>
+  <p style="color:var(--text-3);margin-bottom:32px;text-align:center">Vocational Tax Corner &mdash; Periode 2026/2027</p>
+  <div class="card-c" style="padding:32px;width:90%;max-width:420px;text-align:center">
+    <input type="text" id="inp-nama" class="input-c" placeholder="Nama lengkap Anda" autocomplete="off" style="display:block;margin:0 auto 20px">
+    <button class="btn-c btn-blue" style="width:100%;font-size:1rem" onclick="enterVoter()">Masuk</button>
+  </div>
+  <a href="#" onclick="go('s-admin-login')" style="margin-top:36px;color:var(--text-4);text-decoration:none;font-size:.88rem"><i class="fa-solid fa-gear" style="margin-right:4px"></i>Admin</a>
+</div>
+
+<!-- ========== 2. LOCATION ========== -->
+<div id="s-location" class="screen">
+  <div style="position:relative;width:140px;height:140px;display:flex;align-items:center;justify-content:center;margin-bottom:28px">
+    <div class="loc-ring" style="animation-delay:0s"></div>
+    <div class="loc-ring" style="animation-delay:.6s"></div>
+    <i class="fa-solid fa-location-dot" style="font-size:2rem;color:var(--blue);position:relative;z-index:2"></i>
+  </div>
+  <h2 id="loc-title" style="font-weight:700;font-size:1.3rem;margin-bottom:8px">Memeriksa lokasi...</h2>
+  <p id="loc-sub" style="color:var(--text-3);text-align:center;max-width:340px">Pastikan Anda mengizinkan akses lokasi di browser.</p>
+  <button id="loc-retry" class="btn-c btn-blue" style="margin-top:24px;display:none" onclick="doLocCheck()">Coba Lagi</button>
+</div>
+
+<!-- ========== 3. WAITING ========== -->
+<div id="s-waiting" class="screen">
+  <div class="card-c" style="padding:40px;text-align:center;max-width:340px;width:90%">
+    <i class="fa-solid fa-clock" style="font-size:2.4rem;color:var(--text-4);margin-bottom:16px"></i>
+    <h3 style="font-weight:700;font-size:1.15rem;margin-bottom:6px">Menunggu Sesi Dibuka</h3>
+    <p id="wait-phase" style="color:var(--text-3);font-size:.9rem;margin-bottom:20px">Pemilihan Ketua</p>
+    <p id="wait-count" style="color:var(--text-4);font-size:.85rem"><i class="fa-solid fa-users" style="margin-right:6px"></i>-- anggota terdaftar</p>
+  </div>
+</div>
+
+<!-- ========== 4. VOTE ========== -->
+<div id="s-vote" class="screen screen-top">
+  <div class="timer-bar"><span class="timer-text" id="timer">07:00</span></div>
+  <div style="text-align:center;margin-top:8px">
+    <h2 id="vote-title" style="font-weight:800;font-size:1.4rem;margin-bottom:2px">Pemilihan Ketua</h2>
+    <p style="color:var(--text-3);font-size:.9rem">Pilih satu kandidat</p>
+  </div>
+  <div class="cand-grid" id="vote-grid"></div>
+  <div style="position:fixed;bottom:0;left:0;width:100%;background:var(--white);border-top:1px solid var(--border);padding:14px 20px;text-align:center;z-index:10">
+    <button id="btn-vote-next" class="btn-c btn-blue" style="width:100%;max-width:440px;font-size:1rem" disabled onclick="goConfirm()">Pilih Kandidat Ini</button>
+  </div>
+</div>
+
+<!-- ========== 5. CONFIRM ========== -->
+<div id="s-confirm" class="screen">
+  <h2 style="font-weight:800;font-size:1.3rem;margin-bottom:6px">Konfirmasi Pilihan</h2>
+  <p id="conf-phase" style="color:var(--text-3);margin-bottom:28px;font-size:.9rem">Pemilihan Ketua</p>
+  <div class="card-c" style="padding:32px;text-align:center;max-width:340px;width:90%">
+    <img id="conf-img" src="" class="cand-photo" style="width:110px;height:110px;display:block;margin:0 auto 12px">
+    <h3 id="conf-nama" style="font-weight:700;font-size:1.2rem"></h3>
+  </div>
+  <div style="display:flex;gap:12px;margin-top:28px;flex-wrap:wrap;justify-content:center">
+    <button class="btn-outline" onclick="go('s-vote')">Ubah Pilihan</button>
+    <button class="btn-c btn-green" onclick="sendVote()"><i class="fa-solid fa-check"></i> Kirim Suara</button>
+  </div>
+</div>
+
+<!-- ========== 6. DONE ========== -->
+<div id="s-done" class="screen">
+  <div class="card-c" style="padding:40px;text-align:center;max-width:380px;width:90%">
+    <i class="fa-solid fa-circle-check" style="font-size:3.5rem;color:var(--green);margin-bottom:16px"></i>
+    <h2 style="font-weight:800;font-size:1.3rem;color:var(--green);margin-bottom:6px">Suara Tercatat</h2>
+    <p style="color:var(--text-3);margin-bottom:24px;font-size:.95rem">Terima kasih atas partisipasi Anda.</p>
+    <div style="display:flex;align-items:center;justify-content:center;gap:8px;color:var(--text-4);font-size:.88rem">
+      <div class="spinner-border spinner-border-sm" role="status" style="color:var(--blue)"></div>
+      <span>Menunggu sesi ditutup...</span>
+    </div>
+  </div>
+</div>
+
+<!-- ========== 7. RESULTS ========== -->
+<div id="s-results" class="screen" style="padding-top:40px;padding-bottom:60px">
+  <!-- Phase 1: title fade -->
+  <div id="res-p1" style="position:absolute;z-index:5;display:flex;align-items:center;justify-content:center;min-height:100vh;width:100%">
+    <h1 id="res-big-title" style="font-size:2.2rem;font-weight:900;letter-spacing:2px;opacity:0;transition:opacity 1.5s">HASIL PEMILIHAN</h1>
+  </div>
+  <!-- Phase 2: winner reveal -->
+  <div id="res-p2" style="display:none;opacity:0;transition:opacity .5s;width:100%;max-width:800px;flex-direction:column;align-items:center">
+    <h2 id="res-phase-title" style="font-weight:800;font-size:1.3rem;margin-bottom:20px;text-align:center;color:var(--text)">Ketua Terpilih</h2>
+    <div id="res-winner" class="winner-wrap fade-in" style="display:none">
+      <img id="res-w-img" src="" class="winner-photo">
+      <h3 id="res-w-nama" style="font-weight:700;font-size:1.3rem;margin-bottom:4px"></h3>
+      <p style="font-weight:700;font-size:1rem"><span id="res-w-votes">0</span> suara &middot; <span id="res-w-pct">0</span>%</p>
+    </div>
+    <div id="res-stats" class="card-c" style="padding:24px;margin-top:28px;width:100%;display:none">
+      <h4 style="font-weight:700;font-size:1rem;text-align:center;margin-bottom:6px">Perolehan Suara</h4>
+      <p style="text-align:center;color:var(--text-3);font-size:.88rem;margin-bottom:16px">Total: <strong id="res-total">0</strong> suara</p>
+      <div id="res-bars"></div>
+    </div>
+    <div style="margin-top:28px;text-align:center" id="res-footer">
+      <p style="color:var(--text-4);font-size:.85rem;margin-bottom:12px">Vocational Tax Corner &mdash; Periode 2026/2027</p>
+      <button class="btn-outline" onclick="backToLanding()">Kembali ke Beranda</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== 8. ADMIN LOGIN ========== -->
+<div id="s-admin-login" class="screen">
+  <div class="card-c" style="padding:36px;text-align:center;max-width:380px;width:90%">
+    <i class="fa-solid fa-lock" style="font-size:1.6rem;color:var(--text-4);margin-bottom:12px"></i>
+    <h3 style="font-weight:700;font-size:1.15rem;margin-bottom:20px">Admin Panel</h3>
+    <input type="text" id="adm-user" class="form-control mb-3 text-center" placeholder="Username" style="background:var(--bg)">
+    <input type="password" id="adm-pass" class="form-control mb-3 text-center" placeholder="Password" style="background:var(--bg)">
+    <button class="btn-c btn-blue" style="width:100%" onclick="adminLogin()">Masuk</button>
+    <a href="#" onclick="go('s-landing')" style="display:inline-block;margin-top:20px;color:var(--text-4);text-decoration:none;font-size:.85rem">&larr; Kembali</a>
+  </div>
+</div>
+
+<!-- ========== 9. ADMIN DASHBOARD ========== -->
+<div id="s-admin" class="screen screen-top">
+  <!-- Top bar -->
+  <div class="card-c d-flex flex-wrap justify-content-between align-items-center w-100 px-3 py-2 mb-3" style="max-width:1100px">
+    <div class="d-flex align-items-center gap-2">
+      <img src="https://lh3.googleusercontent.com/d/1jqh2mardOYDJP5PPns9-DwxGWIobMX4K" alt="" style="height:32px;border-radius:50%">
+      <span style="font-weight:700;font-size:.95rem">Admin Dashboard</span>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+      <span class="badge" id="adm-status-badge" style="background:var(--bg);color:var(--text-3);border:1px solid var(--border);padding:6px 12px;font-weight:600;font-size:.8rem">--</span>
+      <button class="btn btn-sm btn-outline-secondary" onclick="stopAdmMonitor();go('s-admin-login')" style="font-size:.8rem">Logout</button>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <ul class="nav nav-pills admin-nav mb-3 flex-wrap justify-content-center gap-1" role="tablist">
+    <li><button class="nav-link active" data-bs-toggle="pill" data-bs-target="#tab-kandidat">Kandidat</button></li>
+    <li><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-anggota">Anggota</button></li>
+    <li><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-sesi">Sesi</button></li>
+    <li><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-monitor" onclick="startAdmMonitor()">Monitor</button></li>
+  </ul>
+
+  <div class="tab-content card-c admin-body">
+    <!-- TAB KANDIDAT -->
+    <div class="tab-pane fade show active" id="tab-kandidat">
+      <div class="row">
+        <div class="col-md-6 mb-4">
+          <div class="d-flex justify-content-between align-items-center mb-2 pb-2" style="border-bottom:1px solid var(--border)">
+            <h6 style="font-weight:700;margin:0">Calon Ketua</h6>
+            <button class="btn btn-sm btn-primary" onclick="modalAddCand('ketua')"><i class="fa-solid fa-plus"></i> Tambah</button>
+          </div>
+          <div id="adm-list-ketua"></div>
         </div>
-        <a href="#" class="mt-5 text-muted text-decoration-none" onclick="showScreen('screen-admin-login')"><i class="fa-solid fa-lock me-1"></i> Admin Panel</a>
+        <div class="col-md-6 mb-4">
+          <div class="d-flex justify-content-between align-items-center mb-2 pb-2" style="border-bottom:1px solid var(--border)">
+            <h6 style="font-weight:700;margin:0">Calon Wakil Ketua</h6>
+            <button class="btn btn-sm btn-primary" onclick="modalAddCand('wakil')"><i class="fa-solid fa-plus"></i> Tambah</button>
+          </div>
+          <div id="adm-list-wakil"></div>
+        </div>
+      </div>
     </div>
 
-    <!-- ============ SCREEN 2: LOCATION CHECK ============ -->
-    <div id="screen-location-check" class="screen">
-        <div class="position-relative d-flex justify-content-center align-items-center mb-5" style="width:150px;height:150px;">
-            <div class="radar-circle" style="animation-delay:0s;"></div>
-            <div class="radar-circle" style="animation-delay:0.5s;"></div>
-            <div class="radar-circle" style="animation-delay:1s;"></div>
-            <i class="fa-solid fa-location-dot fs-1 text-primary position-relative"></i>
+    <!-- TAB ANGGOTA -->
+    <div class="tab-pane fade" id="tab-anggota">
+      <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+        <h6 id="adm-member-count" style="font-weight:700;margin:0">0 anggota</h6>
+        <div class="d-flex gap-2">
+          <button class="btn btn-sm btn-outline-secondary" onclick="modalBulkAdd()"><i class="fa-solid fa-list"></i> Bulk</button>
+          <button class="btn btn-sm btn-primary" onclick="modalAddOne()"><i class="fa-solid fa-plus"></i> Tambah</button>
         </div>
-        <h2 class="fw-bold mb-3" id="loc-status-text">📍 Memeriksa Lokasi...</h2>
-        <p class="text-center text-muted px-3" id="loc-subtext">Pastikan Anda memberikan izin akses lokasi pada browser.</p>
-        <button id="btn-loc-retry" class="btn-clean mt-4" style="display:none;" onclick="checkLocation()">Coba Lagi</button>
+      </div>
+      <div class="table-responsive" style="max-height:400px;overflow-y:auto">
+        <table class="table table-sm table-hover tbl-c">
+          <thead class="sticky-top" style="background:var(--bg)"><tr><th>#</th><th>Nama</th><th>Ketua</th><th>Wakil</th><th class="text-end">Aksi</th></tr></thead>
+          <tbody id="adm-member-tbody"></tbody>
+        </table>
+      </div>
     </div>
 
-    <!-- ============ SCREEN 3: WAITING ROOM ============ -->
-    <div id="screen-waiting" class="screen">
-        <div class="clean-card p-5 text-center d-flex flex-column justify-content-center align-items-center pulsing-light" style="width:280px;height:280px;border-radius:50%;">
-            <i class="fa-solid fa-hourglass-half fs-1 mb-3 text-primary"></i>
-            <h3 class="fw-bold m-0" style="font-size:1.2rem;">Menunggu Sesi...</h3>
+    <!-- TAB SESI -->
+    <div class="tab-pane fade" id="tab-sesi">
+      <div class="row">
+        <div class="col-md-6 mb-4">
+          <h6 style="font-weight:700;margin-bottom:12px">Kontrol Sesi</h6>
+          <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:20px">
+            <p id="adm-sess-label" style="font-weight:700;text-align:center;margin-bottom:16px">Status: --</p>
+            <div class="mb-3">
+              <label class="form-label text-sm" style="font-weight:600;color:var(--text-3)">Fase</label>
+              <select id="adm-phase" class="form-select form-select-sm" style="background:var(--white)">
+                <option value="ketua">Pemilihan Ketua</option>
+                <option value="wakil">Pemilihan Wakil Ketua</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label text-sm" style="font-weight:600;color:var(--text-3)">Durasi (detik)</label>
+              <input type="number" id="adm-duration" class="form-control form-control-sm" value="420" style="background:var(--white)">
+            </div>
+            <div class="d-flex flex-column gap-2">
+              <button id="btn-a-start" class="btn btn-success btn-sm" onclick="admStart()"><i class="fa-solid fa-play"></i> Mulai Voting</button>
+              <button id="btn-a-stop" class="btn btn-danger btn-sm" style="display:none" onclick="admStop()"><i class="fa-solid fa-stop"></i> Hentikan</button>
+              <button id="btn-a-reset" class="btn btn-warning btn-sm text-dark" style="display:none" onclick="admReset()"><i class="fa-solid fa-rotate-left"></i> Reset Sesi Ini</button>
+              <button id="btn-a-reset-all" class="btn btn-outline-danger btn-sm" style="display:none" onclick="admResetAll()"><i class="fa-solid fa-trash"></i> Reset Semua Data Voting</button>
+            </div>
+          </div>
         </div>
-        <div class="mt-5 clean-card px-4 py-3">
-            <h5 class="m-0 text-muted" id="waiting-voter-count"><i class="fa-solid fa-users me-2"></i>-- peserta siap</h5>
+        <div class="col-md-6 mb-4">
+          <h6 style="font-weight:700;margin-bottom:12px">Lokasi</h6>
+          <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:20px">
+            <button class="btn btn-sm btn-outline-primary mb-3" onclick="admGrabLoc()"><i class="fa-solid fa-location-crosshairs"></i> Ambil Lokasi Saya</button>
+            <div class="row mb-2">
+              <div class="col-6"><label class="form-label text-sm" style="font-weight:600;color:var(--text-3)">Lat</label><input type="text" id="adm-lat" class="form-control form-control-sm" style="background:var(--white)"></div>
+              <div class="col-6"><label class="form-label text-sm" style="font-weight:600;color:var(--text-3)">Lng</label><input type="text" id="adm-lng" class="form-control form-control-sm" style="background:var(--white)"></div>
+            </div>
+            <div class="mb-3"><label class="form-label text-sm" style="font-weight:600;color:var(--text-3)">Radius (m)</label><input type="number" id="adm-radius" class="form-control form-control-sm" value="100" style="background:var(--white)"></div>
+            <button class="btn btn-primary btn-sm w-100" onclick="admSaveLoc()">Simpan Lokasi</button>
+          </div>
         </div>
+      </div>
     </div>
 
-    <!-- ============ SCREEN 4: VOTE KETUA ============ -->
-    <div id="screen-vote-ketua" class="screen screen-top">
-        <div class="timer-bar" id="top-bar-ketua"><div class="timer-text" id="timer-ketua">07:00</div></div>
-        <div class="text-center mt-4">
-            <h1 class="fw-black"><i class="fa-solid fa-crown text-ketua me-2"></i>Pilih Ketua</h1>
-            <p class="fs-5 text-muted">Vocational Tax Corner 2026/2027</p>
+    <!-- TAB MONITOR -->
+    <div class="tab-pane fade" id="tab-monitor">
+      <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+        <h6 style="font-weight:700;margin:0">Monitor Live</h6>
+        <span id="mon-badge" class="badge" style="background:var(--blue);color:#fff;padding:6px 14px;font-size:.82rem">0 / 0 suara</span>
+      </div>
+      <div class="progress mb-4" style="height:8px;background:var(--bg);border:1px solid var(--border)">
+        <div id="mon-progress" class="progress-bar" style="width:0%;background:var(--green)"></div>
+      </div>
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:16px">
+            <h6 style="font-weight:700;font-size:.88rem;margin-bottom:10px">Perolehan Ketua</h6>
+            <div id="mon-bars-ketua"></div>
+          </div>
         </div>
-        <div class="candidate-grid" id="grid-ketua"></div>
-        <div class="fixed-bottom p-3 p-md-4 text-center bg-white border-top shadow-sm" style="z-index: 10;">
-            <button id="btn-lanjut-wakil" class="btn-clean w-100 fs-5" style="max-width:500px;" disabled onclick="goToWakil()">LANJUT &rarr; Pilih Wakil</button>
+        <div class="col-md-6 mb-3">
+          <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:16px">
+            <h6 style="font-weight:700;font-size:.88rem;margin-bottom:10px">Perolehan Wakil Ketua</h6>
+            <div id="mon-bars-wakil"></div>
+          </div>
         </div>
+      </div>
     </div>
+  </div>
+</div>
 
-    <!-- ============ SCREEN 5: VOTE WAKIL ============ -->
-    <div id="screen-vote-wakil" class="screen screen-top">
-        <div class="timer-bar" id="top-bar-wakil"><div class="timer-text" id="timer-wakil">07:00</div></div>
-        <div class="text-center mt-4">
-            <h1 class="fw-black"><i class="fa-solid fa-star text-wakil me-2"></i>Pilih Wakil Ketua</h1>
-            <p class="fs-5 text-muted">Vocational Tax Corner 2026/2027</p>
-        </div>
-        <div class="candidate-grid" id="grid-wakil"></div>
-        <div class="fixed-bottom p-3 p-md-4 text-center bg-white border-top shadow-sm" style="display:flex; justify-content:center; gap:15px; z-index: 10;">
-            <button class="btn-outline-clean fs-6 px-4" onclick="showScreen('screen-vote-ketua')">&larr; KEMBALI</button>
-            <button id="btn-konfirmasi" class="btn-clean btn-green fs-5 flex-grow-1" style="max-width:400px;" disabled onclick="goToConfirm()">KONFIRMASI &rarr;</button>
-        </div>
-    </div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// ================================================================
+// CONFIG
+// ================================================================
+const API = 'https://script.google.com/macros/s/AKfycbyGPljtgtygouey50siBdXGg57biyVUsN15b1TNdCQnsRgdxJvzpU67YnnSABhRNzfc7Q/exec';
 
-    <!-- ============ SCREEN 6: CONFIRM ============ -->
-    <div id="screen-confirm" class="screen">
-        <h2 class="fw-black mb-4">Konfirmasi Pilihan</h2>
-        <div class="row w-100 justify-content-center px-3" style="max-width:800px; gap:24px;">
-            <div class="col-md-5 clean-card p-4 text-center">
-                <h5 class="text-ketua fw-bold mb-3"><i class="fa-solid fa-crown me-1"></i>Ketua</h5>
-                <img id="confirm-img-ketua" src="" class="candidate-img mx-auto d-block">
-                <h4 id="confirm-nama-ketua" class="fw-bold mt-2">Nama</h4>
-            </div>
-            <div class="col-md-5 clean-card p-4 text-center">
-                <h5 class="text-wakil fw-bold mb-3"><i class="fa-solid fa-star me-1"></i>Wakil Ketua</h5>
-                <img id="confirm-img-wakil" src="" class="candidate-img mx-auto d-block">
-                <h4 id="confirm-nama-wakil" class="fw-bold mt-2">Nama</h4>
-            </div>
-        </div>
-        <div class="mt-5 d-flex gap-3 flex-wrap justify-content-center w-100 px-3">
-            <button class="btn-outline-clean fs-5" onclick="showScreen('screen-vote-ketua')">Ubah Pilihan</button>
-            <button class="btn-clean btn-green fs-5" onclick="submitVote()"><i class="fa-solid fa-check me-2"></i> KIRIM SUARA</button>
-        </div>
-    </div>
+// ================================================================
+// STATE
+// ================================================================
+let voterName = '';
+let selectedCand = null;
+let candidateList = [];
+let currentPhase = 'ketua';
+let remainSec = 0;
+let countdownId = null;
+let pollId = null;
+let monitorId = null;
 
-    <!-- ============ SCREEN 7: DONE ============ -->
-    <div id="screen-done" class="screen">
-        <div class="clean-card p-5 text-center d-flex flex-column align-items-center">
-            <i class="fa-solid fa-circle-check text-success bounce-in" style="font-size:5rem; margin-bottom:20px;"></i>
-            <h2 class="fw-black text-success">Suara Tercatat!</h2>
-            <p class="fs-5 mt-2 mb-4 text-muted">Terima kasih atas partisipasi Anda.</p>
-            <div class="d-flex align-items-center mt-3 text-muted bg-light p-3 rounded">
-                <div class="spinner-border spinner-border-sm me-2 text-primary" role="status"></div>
-                <span class="fw-medium">Menunggu admin menutup sesi...</span>
-            </div>
-        </div>
-    </div>
+// ================================================================
+// API
+// ================================================================
+async function api(action, params) {
+  params = params || {};
+  try {
+    const r = await fetch(API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(Object.assign({ action: action }, params))
+    });
+    return await r.json();
+  } catch (e) {
+    console.error(e);
+    return { status: false, message: 'Koneksi gagal' };
+  }
+}
 
-    <!-- ============ SCREEN 8: RESULT ============ -->
-    <div id="screen-result" class="screen">
-        <div id="result-phase-1" class="w-100 d-flex justify-content-center align-items-center position-absolute" style="z-index:10; min-height:100vh;">
-            <h1 style="font-size:3rem; letter-spacing:5px; opacity:0; transition:opacity 2s; font-weight:900; color:var(--text-main);" id="result-title-main">HASIL PEMILIHAN</h1>
-        </div>
-        <div id="result-phase-2" class="w-100 d-flex flex-column align-items-center justify-content-center py-5" style="opacity:0; display:none; min-height:100vh;">
-            <h2 class="fw-black text-ketua mb-4">✨ KETUA TERPILIH ✨</h2>
-            <div id="winner-ketua-card" class="winner-card bounce-in" style="display:none;">
-                <img id="winner-ketua-img" src="" class="winner-photo">
-                <h3 id="winner-ketua-nama" class="fw-bold text-dark">—</h3>
-                <h5 class="text-ketua mt-2 fw-bold"><span id="winner-ketua-votes">0</span> Suara (<span id="winner-ketua-pct">0</span>%)</h5>
-            </div>
-            
-            <div id="wakil-reveal-area" style="display:none; width:100%;" class="mt-5 d-flex flex-column align-items-center">
-                <h2 class="fw-black text-wakil mb-4">⭐ WAKIL KETUA TERPILIH ⭐</h2>
-                <div id="winner-wakil-card" class="winner-card wakil bounce-in" style="display:none;">
-                    <img id="winner-wakil-img" src="" class="winner-photo">
-                    <h4 id="winner-wakil-nama" class="fw-bold text-dark">—</h4>
-                    <h6 class="text-wakil mt-2 fw-bold"><span id="winner-wakil-votes">0</span> Suara (<span id="winner-wakil-pct">0</span>%)</h6>
-                </div>
-            </div>
-            
-            <div id="result-stats" class="clean-card p-4 mt-5 w-100 shadow-sm" style="max-width:800px; display:none;">
-                <h4 class="text-center fw-bold mb-4">Statistik Pemungutan Suara</h4>
-                <p class="text-center mb-4 fw-medium">Total Suara Masuk: <span id="stat-total-votes" class="fw-bold text-primary">0</span></p>
-                <div class="row">
-                    <div class="col-md-6 mb-4">
-                        <h6 class="text-ketua fw-bold border-bottom pb-2 mb-3">Perolehan Ketua</h6>
-                        <div id="stats-chart-ketua"></div>
-                    </div>
-                    <div class="col-md-6 mb-4">
-                        <h6 class="text-wakil fw-bold border-bottom pb-2 mb-3">Perolehan Wakil Ketua</h6>
-                        <div id="stats-chart-wakil"></div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="mt-5 text-center text-muted pb-5" id="result-footer" style="display:none;">
-                <p>Vocational Tax Corner &mdash; Periode 2026/2027</p>
-            </div>
-        </div>
-    </div>
+// ================================================================
+// NAV
+// ================================================================
+function go(id) {
+  document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('active'); });
+  document.getElementById(id).classList.add('active');
+}
 
-    <!-- ============ SCREEN 9: ADMIN LOGIN ============ -->
-    <div id="screen-admin-login" class="screen">
-        <div class="clean-card p-5 text-center" style="max-width:400px; width:90%;">
-            <i class="fa-solid fa-lock fs-1 text-primary mb-3"></i>
-            <h3 class="fw-bold mb-4">Admin Panel</h3>
-            <input type="text" id="admin-user" class="form-control mb-3 py-2 text-center bg-light" placeholder="Username">
-            <input type="password" id="admin-pass" class="form-control mb-4 py-2 text-center bg-light" placeholder="Password">
-            <button class="btn-clean w-100" onclick="handleAdminLogin()">LOGIN</button>
-            <br>
-            <a href="#" class="mt-4 d-inline-block text-muted text-decoration-none" onclick="showScreen('screen-landing')">&larr; Kembali ke Pemilih</a>
-        </div>
-    </div>
+function loading(msg) { Swal.fire({ title: msg || 'Memproses...', allowOutsideClick: false, didOpen: function() { Swal.showLoading(); } }); }
+function done() { Swal.close(); }
+function toast(icon, msg) { Swal.fire({ toast: true, position: 'top-end', icon: icon, title: msg, showConfirmButton: false, timer: 2500 }); }
 
-    <!-- ============ SCREEN 10: ADMIN DASHBOARD ============ -->
-    <div id="screen-admin" class="screen screen-top">
-        <div class="w-100 px-3 px-md-4 d-flex flex-wrap justify-content-between align-items-center mb-4 clean-card py-3">
-            <div class="d-flex align-items-center mb-2 mb-md-0">
-                <img src="https://lh3.googleusercontent.com/d/1jqh2mardOYDJP5PPns9-DwxGWIobMX4K" alt="Logo" style="height:40px; margin-right:15px; border-radius:50%;">
-                <h5 class="m-0 fw-bold">Admin Dashboard</h5>
-            </div>
-            <div class="d-flex align-items-center gap-3">
-                <span class="badge bg-secondary px-3 py-2" id="admin-badge-status">Memuat...</span>
-                <button class="btn btn-outline-danger btn-sm rounded-pill px-3 fw-bold" onclick="logoutAdmin()"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
-            </div>
-        </div>
-        
-        <ul class="nav nav-pills admin-nav mb-4 flex-wrap justify-content-center" id="adminTabs" role="tablist">
-            <li class="nav-item" role="presentation"><button class="nav-link active" data-bs-toggle="pill" data-bs-target="#content-kandidat" type="button" role="tab">Kandidat</button></li>
-            <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#content-anggota" type="button" role="tab">Anggota</button></li>
-            <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#content-sesi" type="button" role="tab">Sesi Voting</button></li>
-            <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#content-monitor" type="button" role="tab" onclick="startAdminMonitor()">Monitor</button></li>
-        </ul>
-        
-        <div class="tab-content clean-card admin-content" id="adminTabsContent">
-            <!-- TAB KANDIDAT -->
-            <div class="tab-pane fade show active" id="content-kandidat" role="tabpanel">
-                <div class="row">
-                    <div class="col-md-6 mb-4">
-                        <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
-                            <h5 class="m-0 text-ketua fw-bold"><i class="fa-solid fa-crown me-2"></i>Calon Ketua</h5>
-                            <button class="btn btn-sm btn-primary rounded-pill px-3" onclick="modalAddKandidat('ketua')"><i class="fa-solid fa-plus"></i> Tambah</button>
-                        </div>
-                        <div id="admin-list-ketua" class="d-flex flex-column gap-2"></div>
-                    </div>
-                    <div class="col-md-6 mb-4">
-                        <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
-                            <h5 class="m-0 text-wakil fw-bold"><i class="fa-solid fa-star me-2"></i>Calon Wakil Ketua</h5>
-                            <button class="btn btn-sm btn-primary rounded-pill px-3" onclick="modalAddKandidat('wakil')"><i class="fa-solid fa-plus"></i> Tambah</button>
-                        </div>
-                        <div id="admin-list-wakil" class="d-flex flex-column gap-2"></div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- TAB ANGGOTA -->
-            <div class="tab-pane fade" id="content-anggota" role="tabpanel">
-                <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
-                    <h5 class="m-0 fw-bold" id="admin-anggota-count">Total: 0 anggota</h5>
-                    <div>
-                        <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 me-2" onclick="modalAddAnggotaBulk()"><i class="fa-solid fa-list"></i> Bulk Add</button>
-                        <button class="btn btn-sm btn-primary rounded-pill px-3" onclick="modalAddAnggota()"><i class="fa-solid fa-plus"></i> Tambah</button>
-                    </div>
-                </div>
-                <div class="table-responsive" style="max-height:450px; overflow-y:auto;">
-                    <table class="table table-hover align-middle table-clean">
-                        <thead class="bg-light sticky-top"><tr><th>#</th><th>Nama Anggota</th><th>Status Vote</th><th class="text-end">Aksi</th></tr></thead>
-                        <tbody id="admin-list-anggota"></tbody>
-                    </table>
-                </div>
-            </div>
-            
-            <!-- TAB SESI -->
-            <div class="tab-pane fade" id="content-sesi" role="tabpanel">
-                <div class="row">
-                    <div class="col-md-6 mb-4">
-                        <h5 class="mb-3 border-bottom pb-2 fw-bold">Kontrol Sesi</h5>
-                        <div class="bg-light rounded p-4 text-center border">
-                            <h3 id="admin-session-status-text" class="mb-4 fw-bold">Status: —</h3>
-                            <div class="mb-4 text-start">
-                                <label class="form-label text-muted fw-bold">Durasi Voting (Detik)</label>
-                                <input type="number" id="admin-duration" class="form-control bg-white" value="420">
-                            </div>
-                            <div class="d-flex flex-column gap-2">
-                                <button id="btn-admin-start" class="btn btn-success py-2 fw-bold" onclick="adminStartSession()"><i class="fa-solid fa-rocket me-2"></i>Mulai Voting</button>
-                                <button id="btn-admin-stop" class="btn btn-danger py-2 fw-bold" style="display:none;" onclick="adminStopSession()"><i class="fa-solid fa-stop me-2"></i>Hentikan</button>
-                                <button id="btn-admin-reset" class="btn btn-warning py-2 fw-bold text-dark" style="display:none;" onclick="adminResetSession()"><i class="fa-solid fa-rotate-left me-2"></i>Reset Sesi</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6 mb-4">
-                        <h5 class="mb-3 border-bottom pb-2 fw-bold">Pengaturan Lokasi</h5>
-                        <div class="bg-light rounded p-4 border">
-                            <div class="mb-3"><button class="btn btn-sm btn-outline-primary mb-2" onclick="adminGetLocation()"><i class="fa-solid fa-location-crosshairs me-1"></i> Ambil Lokasi Saya</button></div>
-                            <div class="row">
-                                <div class="col-6 mb-3"><label class="form-label text-muted fw-bold">Latitude</label><input type="text" id="admin-lat" class="form-control bg-white"></div>
-                                <div class="col-6 mb-3"><label class="form-label text-muted fw-bold">Longitude</label><input type="text" id="admin-lng" class="form-control bg-white"></div>
-                            </div>
-                            <div class="mb-4"><label class="form-label text-muted fw-bold">Radius (Meter)</label><input type="number" id="admin-radius" class="form-control bg-white" value="100"></div>
-                            <button class="btn btn-primary w-100 fw-bold" onclick="saveLocationSettings()">Simpan Lokasi</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- TAB MONITOR -->
-            <div class="tab-pane fade" id="content-monitor" role="tabpanel">
-                <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2 border-bottom pb-2">
-                    <h5 class="m-0 fw-bold">Monitor Live</h5>
-                    <span class="badge bg-primary px-3 py-2" id="monitor-progress-text">0 / 0 Suara</span>
-                </div>
-                <div class="progress mb-4 bg-light border" style="height:12px;">
-                    <div id="monitor-progress-bar" class="progress-bar bg-success" role="progressbar" style="width:0%;"></div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6 mb-4">
-                        <div class="bg-light p-4 rounded border">
-                            <h6 class="text-ketua fw-bold mb-3">Perolehan Ketua</h6>
-                            <div id="monitor-chart-ketua"></div>
-                        </div>
-                    </div>
-                    <div class="col-md-6 mb-4">
-                        <div class="bg-light p-4 rounded border">
-                            <h6 class="text-wakil fw-bold mb-3">Perolehan Wakil</h6>
-                            <div id="monitor-chart-wakil"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+function startPoll(fn, ms) { stopPoll(); fn(); pollId = setInterval(fn, ms || 2500); }
+function stopPoll() { if (pollId) { clearInterval(pollId); pollId = null; } }
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // ====================================================
-        // KONFIGURASI
-        // ====================================================
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyGPljtgtygouey50siBdXGg57biyVUsN15b1TNdCQnsRgdxJvzpU67YnnSABhRNzfc7Q/exec';
+function phaseLabel(p) { return p === 'wakil' ? 'Pemilihan Wakil Ketua' : 'Pemilihan Ketua'; }
+function defaultImg(nama) { return 'https://ui-avatars.com/api/?name=' + encodeURIComponent(nama) + '&background=e5e7eb&color=374151&size=200&bold=true'; }
 
-        // ====================================================
-        // GLOBAL STATE
-        // ====================================================
-        let currentVoterName = '';
-        let selectedKetua = null;   // {id, nama, foto, ...}
-        let selectedWakil = null;
-        let dataCalonKetua = [];
-        let dataCalonWakil = [];
-        let cachedSessionData = null;
-        let pollingInterval = null;
-        let localCountdownInterval = null;
-        let serverRemainingSeconds = 0;
-        let adminMonitorInterval = null;
+function haversine(a, b, c, d) {
+  var R = 6371000, dLat = (c - a) * Math.PI / 180, dLon = (d - b) * Math.PI / 180;
+  var x = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(a * Math.PI / 180) * Math.cos(c * Math.PI / 180) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  return R * 2 * Math.atan2(Math.sqrt(x), Math.sqrt(1 - x));
+}
 
-        // ====================================================
-        // API HELPER
-        // ====================================================
-        async function fetchAPI(action, params = {}) {
-            const payload = { action, ...params };
-            try {
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify(payload)
-                });
-                return await response.json();
-            } catch (error) {
-                console.error('API Error:', error);
-                return { status: false, message: 'Koneksi ke server gagal.' };
-            }
+// ================================================================
+// VOTER FLOW
+// ================================================================
+async function enterVoter() {
+  var name = document.getElementById('inp-nama').value.trim();
+  if (!name) { Swal.fire('', 'Masukkan nama Anda', 'warning'); return; }
+
+  loading('Memverifikasi...');
+  var r = await api('validateVoter', { nama: name });
+  done();
+
+  if (!r.status) { Swal.fire('Ditolak', r.message, 'error'); return; }
+
+  voterName = name;
+
+  loading('Memuat sesi...');
+  var s = await api('getSessionData');
+  done();
+
+  if (s.status && s.data) {
+    var sess = s.data.session;
+    currentPhase = sess.phase || 'ketua';
+    candidateList = s.data.candidates || [];
+
+    if (sess.centerLat && sess.centerLng) {
+      go('s-location');
+      setTimeout(doLocCheck, 400);
+    } else {
+      goWaiting();
+    }
+  } else {
+    goWaiting();
+  }
+}
+
+// ================================================================
+// LOCATION
+// ================================================================
+var cachedSession = null;
+
+function doLocCheck() {
+  var t = document.getElementById('loc-title');
+  var sub = document.getElementById('loc-sub');
+  var btn = document.getElementById('loc-retry');
+  t.textContent = 'Memeriksa lokasi...';
+  t.style.color = 'var(--text)';
+  btn.style.display = 'none';
+
+  if (!navigator.geolocation) {
+    t.textContent = 'Geolocation tidak didukung';
+    t.style.color = 'var(--red)';
+    btn.style.display = '';
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    function(pos) {
+      api('getSessionData').then(function(res) {
+        if (!res.status || !res.data) { t.textContent = 'Gagal memuat data sesi'; t.style.color = 'var(--red)'; btn.style.display = ''; return; }
+        var sess = res.data.session;
+        cachedSession = res.data;
+        var dist = haversine(pos.coords.latitude, pos.coords.longitude, parseFloat(sess.centerLat), parseFloat(sess.centerLng));
+        var rad = parseFloat(sess.radius) || 100;
+        if (dist <= rad) {
+          t.textContent = 'Lokasi sesuai';
+          t.style.color = 'var(--green)';
+          sub.textContent = 'Mengarahkan...';
+          setTimeout(goWaiting, 1200);
+        } else {
+          t.textContent = 'Di luar area voting';
+          t.style.color = 'var(--red)';
+          sub.textContent = 'Jarak Anda: ' + Math.round(dist) + 'm. Maksimal: ' + rad + 'm.';
+          btn.style.display = '';
         }
+      });
+    },
+    function() {
+      t.textContent = 'Akses lokasi ditolak';
+      t.style.color = 'var(--amber)';
+      sub.textContent = 'Izinkan akses lokasi di pengaturan browser.';
+      btn.style.display = '';
+    },
+    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+  );
+}
 
-        // ====================================================
-        // UTILITIES
-        // ====================================================
-        function showScreen(screenId) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            setTimeout(() => document.getElementById(screenId).classList.add('active'), 300);
-        }
-        function showLoading(msg='Memproses...') { Swal.fire({title:msg, allowOutsideClick:false, didOpen:()=>Swal.showLoading()}); }
-        function closeLoading() { Swal.close(); }
-        function showToast(icon, title) { Swal.fire({toast:true, position:'top-end', icon, title, showConfirmButton:false, timer:3000}); }
+// ================================================================
+// WAITING ROOM
+// ================================================================
+function goWaiting() {
+  go('s-waiting');
+  startPoll(async function() {
+    var r = await api('getSessionData');
+    if (!r.status || !r.data) return;
+    var sess = r.data.session;
+    currentPhase = sess.phase || 'ketua';
+    candidateList = r.data.candidates || [];
 
-        function startPolling(callback, ms=2000) { stopPolling(); callback(); pollingInterval = setInterval(callback, ms); }
-        function stopPolling() { if(pollingInterval){clearInterval(pollingInterval); pollingInterval=null;} }
+    document.getElementById('wait-phase').textContent = phaseLabel(currentPhase);
+    document.getElementById('wait-count').innerHTML = '<i class="fa-solid fa-users" style="margin-right:6px"></i>' + (r.data.totalVoters || 0) + ' anggota terdaftar';
 
-        function haversineDistance(lat1,lon1,lat2,lon2) {
-            const R=6371000; const dLat=(lat2-lat1)*Math.PI/180; const dLon=(lon2-lon1)*Math.PI/180;
-            const a=Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
-            return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
-        }
+    if (sess.status === 'active') {
+      stopPoll();
+      remainSec = sess.remainingSeconds || 0;
+      renderVoteScreen();
+      startCountdown();
+      go('s-vote');
+    } else if (sess.status === 'finished') {
+      stopPoll();
+      showResults();
+    }
+  }, 2500);
+}
 
-        // ====================================================
-        // COUNTDOWN
-        // ====================================================
-        function startLocalCountdown() {
-            if(localCountdownInterval) clearInterval(localCountdownInterval);
-            localCountdownInterval = setInterval(() => {
-                if(serverRemainingSeconds > 0) { serverRemainingSeconds--; updateCountdownDisplay(serverRemainingSeconds); }
-                if(serverRemainingSeconds <= 0) {
-                    clearInterval(localCountdownInterval);
-                    const onVoteScreen = document.getElementById('screen-vote-ketua').classList.contains('active') || document.getElementById('screen-vote-wakil').classList.contains('active') || document.getElementById('screen-confirm').classList.contains('active');
-                    if(onVoteScreen) handleTimeUp();
-                }
-            }, 1000);
-        }
-        function updateCountdownDisplay(sec) {
-            const min=Math.floor(sec/60); const s=sec%60;
-            const text = `${String(min).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-            
-            ['ketua','wakil'].forEach(type => {
-                const textEl = document.getElementById(`timer-${type}`);
-                const barEl = document.getElementById(`top-bar-${type}`);
-                if(!textEl || !barEl) return;
-                
-                textEl.innerText = text;
-                textEl.className = 'timer-text';
-                barEl.className = 'timer-bar';
-                
-                if(sec <= 30) {
-                    textEl.classList.add('timer-danger');
-                    barEl.classList.add('bg-danger-light');
-                } else if(sec <= 60) {
-                    textEl.classList.add('timer-warning');
-                }
-            });
-        }
-        function handleTimeUp() {
-            Swal.fire('Waktu Habis!','Waktu voting telah selesai.','warning').then(()=>{ if(selectedKetua&&selectedWakil) submitVote(true); else { showScreen('screen-done'); waitForResults(); }});
-        }
+// ================================================================
+// VOTE SCREEN
+// ================================================================
+function renderVoteScreen() {
+  document.getElementById('vote-title').textContent = phaseLabel(currentPhase);
+  selectedCand = null;
+  document.getElementById('btn-vote-next').disabled = true;
 
-        // ====================================================
-        // VOTER FLOW
-        // ====================================================
-        async function handleVoterEntry() {
-            const name = document.getElementById('voter-name').value.trim();
-            if(!name) { Swal.fire('Error','Nama tidak boleh kosong','error'); return; }
-            showLoading('Memverifikasi nama...');
-            const res = await fetchAPI('validateVoter', {nama: name});
-            closeLoading();
-            if(!res.status) { Swal.fire('Ditolak', res.message || 'Nama tidak terdaftar atau sudah memilih.', 'error'); return; }
+  var grid = document.getElementById('vote-grid');
+  grid.innerHTML = '';
+  if (!candidateList.length) { grid.innerHTML = '<p style="text-align:center;color:var(--text-4);grid-column:1/-1">Belum ada kandidat.</p>'; return; }
 
-            currentVoterName = name;
-            // Fetch session data to check location
-            showLoading('Memuat sesi...');
-            const sessRes = await fetchAPI('getSessionData');
-            closeLoading();
-            if(sessRes.status && sessRes.data) {
-                cachedSessionData = sessRes.data;
-                const sess = cachedSessionData.session;
-                if(sess.centerLat && sess.centerLng) { showScreen('screen-location-check'); setTimeout(checkLocation, 500); }
-                else { enterWaitingRoom(); }
-            } else {
-                enterWaitingRoom();
-            }
-        }
+  candidateList.forEach(function(c) {
+    var d = document.createElement('div');
+    d.className = 'cand-card';
+    d.setAttribute('data-id', c.id || c.nama);
+    d.onclick = function() { pickCand(c, d); };
 
-        function checkLocation() {
-            const btn=document.getElementById('btn-loc-retry'); const txt=document.getElementById('loc-status-text'); const sub=document.getElementById('loc-subtext');
-            btn.style.display='none'; txt.innerText='📍 Memeriksa Lokasi...'; txt.className='fw-bold mb-3';
-            if(!navigator.geolocation) { txt.innerText='❌ Geolocation tidak didukung'; txt.className='fw-bold mb-3 text-danger'; btn.style.display='block'; return; }
-            navigator.geolocation.getCurrentPosition(
-                pos => {
-                    const sess = cachedSessionData.session;
-                    const dist = haversineDistance(pos.coords.latitude, pos.coords.longitude, parseFloat(sess.centerLat), parseFloat(sess.centerLng));
-                    const radius = parseFloat(sess.radius) || 100;
-                    if(dist <= radius) { txt.innerText='✅ Lokasi Sesuai'; txt.className='fw-bold mb-3 text-success'; sub.innerText='Mengarahkan ke ruang tunggu...'; setTimeout(enterWaitingRoom, 1500); }
-                    else { txt.innerText='❌ Di Luar Area Voting'; txt.className='fw-bold mb-3 text-danger'; sub.innerText=`Jarak Anda: ${Math.round(dist)}m. Maksimal: ${radius}m.`; btn.style.display='block'; }
-                },
-                err => { txt.innerText='❌ Akses Lokasi Ditolak'; txt.className='fw-bold mb-3 text-warning'; sub.innerText='Silakan izinkan akses lokasi di browser.'; btn.style.display='block'; },
-                {enableHighAccuracy:true, timeout:10000, maximumAge:0}
-            );
-        }
+    var foto = c.foto || defaultImg(c.nama);
+    d.innerHTML =
+      '<div class="pick-mark"><i class="fa-solid fa-check"></i></div>' +
+      '<img src="' + foto + '" class="cand-photo" onerror="this.src=\'' + defaultImg(c.nama) + '\'">' +
+      '<h4 style="font-weight:700;font-size:1.05rem;margin-bottom:4px">' + c.nama + '</h4>' +
+      '<button class="btn btn-sm btn-outline-secondary" style="font-size:.78rem;margin-top:8px" onclick="event.stopPropagation();toggleVM(this)">Visi & Misi</button>' +
+      '<div class="vm-box"><strong>Visi:</strong><br>' + (c.visi || '-') + '<br><br><strong>Misi:</strong><br>' + (c.misi || '-') + '</div>';
+    grid.appendChild(d);
+  });
+}
 
-        async function enterWaitingRoom() {
-            showScreen('screen-waiting');
-            // Load candidates
-            const sessRes = await fetchAPI('getSessionData');
-            if(sessRes.status && sessRes.data) {
-                cachedSessionData = sessRes.data;
-                dataCalonKetua = sessRes.data.calonKetua || [];
-                dataCalonWakil = sessRes.data.calonWakil || [];
-                renderCandidateCards('grid-ketua', dataCalonKetua, 'ketua');
-                renderCandidateCards('grid-wakil', dataCalonWakil, 'wakil');
-            }
-            startPolling(async () => {
-                const res = await fetchAPI('getSessionData');
-                if(res.status && res.data) {
-                    cachedSessionData = res.data;
-                    const sess = res.data.session;
-                    dataCalonKetua = res.data.calonKetua || dataCalonKetua;
-                    dataCalonWakil = res.data.calonWakil || dataCalonWakil;
-                    renderCandidateCards('grid-ketua', dataCalonKetua, 'ketua');
-                    renderCandidateCards('grid-wakil', dataCalonWakil, 'wakil');
-                    document.getElementById('waiting-voter-count').innerHTML = `<i class="fa-solid fa-users me-2"></i>${res.data.totalVoted || 0} dari ${res.data.totalVoters || 0} sudah siap`;
-                    if(sess.status === 'active') {
-                        stopPolling();
-                        serverRemainingSeconds = sess.remainingSeconds || 0;
-                        startLocalCountdown();
-                        showScreen('screen-vote-ketua');
-                    } else if(sess.status === 'finished') {
-                        stopPolling();
-                        fetchAndShowResults();
-                    }
-                }
-            }, 2000);
-        }
+function pickCand(c, el) {
+  document.querySelectorAll('#vote-grid .cand-card').forEach(function(x) { x.classList.remove('picked'); });
+  el.classList.add('picked');
+  selectedCand = c;
+  document.getElementById('btn-vote-next').disabled = false;
+}
 
-        // ====================================================
-        // RENDER CANDIDATE CARDS
-        // ====================================================
-        function renderCandidateCards(containerId, data, type) {
-            const container = document.getElementById(containerId); container.innerHTML = '';
-            if(!data || data.length===0) { container.innerHTML='<div class="text-center text-muted py-4">Belum ada kandidat.</div>'; return; }
-            data.forEach(k => {
-                const defaultImg = `https://ui-avatars.com/api/?name=${encodeURIComponent(k.nama)}&background=random&color=fff&size=200&bold=true`;
-                const fotoSrc = k.foto || defaultImg;
-                const card = document.createElement('div');
-                card.className='candidate-card'; card.id=`card-${type}-${k.id||k.nama}`;
-                card.onclick = () => selectCandidate(type, k);
-                card.innerHTML = `
-                    <i class="fa-solid fa-circle-check check-overlay"></i>
-                    <img src="${fotoSrc}" class="candidate-img" onerror="this.src='${defaultImg}'">
-                    <h4 class="fw-bold text-dark">${k.nama}</h4>
-                    <div class="mt-3"><button class="btn btn-sm btn-outline-secondary rounded-pill" onclick="event.stopPropagation(); toggleVisiMisi('${type}-${k.id||k.nama}')">Visi & Misi <i class="fa-solid fa-chevron-down ms-1"></i></button></div>
-                    <div id="visimisi-${type}-${k.id||k.nama}" class="visi-misi mt-2"><strong>Visi:</strong><br>${k.visi||'-'}<br><br><strong>Misi:</strong><br>${k.misi||'-'}</div>`;
-                container.appendChild(card);
-            });
-        }
-        function toggleVisiMisi(id) { const el=document.getElementById(`visimisi-${id}`); if(el) el.style.display=el.style.display==='block'?'none':'block'; }
+function toggleVM(btn) {
+  var box = btn.parentElement.querySelector('.vm-box');
+  box.style.display = box.style.display === 'block' ? 'none' : 'block';
+}
 
-        function selectCandidate(type, candidate) {
-            const containerId = type==='ketua' ? 'grid-ketua' : 'grid-wakil';
-            document.querySelectorAll(`#${containerId} .candidate-card`).forEach(el=>el.classList.remove('selected'));
-            const cardId = `card-${type}-${candidate.id||candidate.nama}`;
-            document.getElementById(cardId).classList.add('selected');
-            if(type==='ketua') { selectedKetua=candidate; document.getElementById('btn-lanjut-wakil').disabled=false; }
-            else { selectedWakil=candidate; document.getElementById('btn-konfirmasi').disabled=false; }
-        }
+// ================================================================
+// CONFIRM & SUBMIT
+// ================================================================
+function goConfirm() {
+  if (!selectedCand) return;
+  document.getElementById('conf-phase').textContent = phaseLabel(currentPhase);
+  document.getElementById('conf-img').src = selectedCand.foto || defaultImg(selectedCand.nama);
+  document.getElementById('conf-nama').textContent = selectedCand.nama;
+  go('s-confirm');
+}
 
-        function goToWakil() { if(selectedKetua) showScreen('screen-vote-wakil'); }
-        function goToConfirm() {
-            if(!selectedKetua || !selectedWakil) return;
-            const defK = `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedKetua.nama)}&background=random&color=fff&size=200`;
-            const defW = `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedWakil.nama)}&background=random&color=fff&size=200`;
-            document.getElementById('confirm-img-ketua').src = selectedKetua.foto || defK;
-            document.getElementById('confirm-nama-ketua').innerText = selectedKetua.nama;
-            document.getElementById('confirm-img-wakil').src = selectedWakil.foto || defW;
-            document.getElementById('confirm-nama-wakil').innerText = selectedWakil.nama;
-            showScreen('screen-confirm');
-        }
+async function sendVote() {
+  loading('Mengirim suara...');
+  var r = await api('submitVote', { nama: voterName, pilihan: selectedCand.nama });
+  done();
+  if (countdownId) { clearInterval(countdownId); countdownId = null; }
 
-        async function submitVote(isAuto=false) {
-            showLoading('Mengirim suara...');
-            const res = await fetchAPI('submitVote', {
-                nama: currentVoterName,
-                pilihanKetua: selectedKetua ? selectedKetua.nama : '',
-                pilihanWakil: selectedWakil ? selectedWakil.nama : ''
-            });
-            closeLoading();
-            if(localCountdownInterval) clearInterval(localCountdownInterval);
-            if(res.status) { showScreen('screen-done'); waitForResults(); }
-            else { Swal.fire('Error', res.message || 'Gagal mengirim suara', 'error'); }
-        }
+  if (r.status) {
+    go('s-done');
+    waitForEnd();
+  } else {
+    Swal.fire('Gagal', r.message, 'error');
+  }
+}
 
-        function waitForResults() {
-            startPolling(async () => {
-                const sess = await fetchAPI('getSessionData');
-                if(sess.status && sess.data && sess.data.session.status === 'finished') { stopPolling(); fetchAndShowResults(); }
-            }, 3000);
-        }
+function waitForEnd() {
+  startPoll(async function() {
+    var r = await api('getSessionData');
+    if (r.status && r.data && r.data.session.status === 'finished') {
+      stopPoll();
+      showResults();
+    }
+  }, 3000);
+}
 
-        // ====================================================
-        // RESULTS & WINNER REVEAL
-        // ====================================================
-        async function fetchAndShowResults() {
-            showLoading('Menghitung hasil...');
-            const res = await fetchAPI('getResults');
-            closeLoading();
-            if(!res.status || !res.data) { Swal.fire('Error','Gagal memuat hasil','error'); return; }
+// ================================================================
+// COUNTDOWN
+// ================================================================
+function startCountdown() {
+  if (countdownId) clearInterval(countdownId);
+  updateTimerUI(remainSec);
+  countdownId = setInterval(function() {
+    if (remainSec > 0) { remainSec--; updateTimerUI(remainSec); }
+    if (remainSec <= 0) {
+      clearInterval(countdownId); countdownId = null;
+      var onVote = document.getElementById('s-vote').classList.contains('active') || document.getElementById('s-confirm').classList.contains('active');
+      if (onVote) timeUp();
+    }
+  }, 1000);
+}
 
-            const results = res.data;
-            const winK = results.winnerKetua;
-            const winW = results.winnerWakil;
-            const total = results.totalVotes || 0;
+function updateTimerUI(s) {
+  var el = document.getElementById('timer');
+  var m = Math.floor(s / 60);
+  el.textContent = String(m).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
+  el.className = 'timer-text' + (s <= 30 ? ' danger' : s <= 60 ? ' warn' : '');
+}
 
-            if(winK) {
-                const defImg = `https://ui-avatars.com/api/?name=${encodeURIComponent(winK.nama)}&background=random&color=fff&size=200`;
-                document.getElementById('winner-ketua-img').src = winK.foto || defImg;
-                document.getElementById('winner-ketua-nama').innerText = winK.nama;
-                document.getElementById('winner-ketua-votes').innerText = winK.voteCount;
-                document.getElementById('winner-ketua-pct').innerText = total > 0 ? Math.round((winK.voteCount/total)*100) : 0;
-            }
-            if(winW) {
-                const defImg = `https://ui-avatars.com/api/?name=${encodeURIComponent(winW.nama)}&background=random&color=fff&size=200`;
-                document.getElementById('winner-wakil-img').src = winW.foto || defImg;
-                document.getElementById('winner-wakil-nama').innerText = winW.nama;
-                document.getElementById('winner-wakil-votes').innerText = winW.voteCount;
-                document.getElementById('winner-wakil-pct').innerText = total > 0 ? Math.round((winW.voteCount/total)*100) : 0;
-            }
+function timeUp() {
+  Swal.fire('Waktu Habis', 'Waktu voting telah berakhir.', 'info').then(function() {
+    if (selectedCand) { sendVote(); } else { go('s-done'); waitForEnd(); }
+  });
+}
 
-            document.getElementById('stat-total-votes').innerText = total;
-            renderBarChart('stats-chart-ketua', results.calonKetua, total, '#d97706'); // warning
-            renderBarChart('stats-chart-wakil', results.calonWakil, total, '#2563eb'); // primary
+// ================================================================
+// RESULTS
+// ================================================================
+async function showResults() {
+  loading('Menghitung hasil...');
+  var r = await api('getResults', { phase: currentPhase });
+  done();
+  if (!r.status || !r.data) { Swal.fire('Error', 'Gagal memuat hasil', 'error'); return; }
 
-            // REVEAL SEQUENCE
-            showScreen('screen-result');
-            const titleMain = document.getElementById('result-title-main');
-            setTimeout(() => { titleMain.style.opacity = '1'; }, 100);
-            setTimeout(() => {
-                document.getElementById('result-phase-1').style.display = 'none';
-                const p2 = document.getElementById('result-phase-2');
-                p2.style.display = 'flex'; setTimeout(() => { p2.style.opacity = '1'; }, 50);
-                document.getElementById('winner-ketua-card').style.display = 'block';
-                fireConfetti(['#d97706','#f59e0b','#fcd34d']);
-                setTimeout(() => {
-                    document.getElementById('wakil-reveal-area').style.display = 'flex';
-                    document.getElementById('winner-wakil-card').style.display = 'block';
-                    fireConfetti(['#2563eb','#60a5fa','#3b82f6']);
-                    setTimeout(() => {
-                        document.getElementById('result-stats').style.display = 'block';
-                        document.getElementById('result-footer').style.display = 'block';
-                        startContinuousConfetti();
-                    }, 2500);
-                }, 3000);
-            }, 3000);
-        }
+  var data = r.data;
+  var w = data.winner;
+  var total = data.totalVotes || 0;
 
-        function renderBarChart(containerId, candidateResults, totalVotes, colorBase) {
-            const container = document.getElementById(containerId); container.innerHTML = '';
-            if(!candidateResults || candidateResults.length===0) { container.innerHTML='<p class="text-muted">Tidak ada data.</p>'; return; }
-            let html = '';
-            candidateResults.forEach(c => {
-                const pct = totalVotes > 0 ? (c.voteCount/totalVotes)*100 : 0;
-                html += `<div class="bar-chart-row"><div class="bar-chart-label" title="${c.nama}">${c.nama}</div><div class="bar-chart-bar-wrap"><div class="bar-chart-bar" style="width:0%; background:${colorBase};" data-target="${pct}%"></div></div><div class="bar-chart-count">${c.voteCount}</div></div>`;
-            });
-            container.innerHTML = html;
-            setTimeout(() => { container.querySelectorAll('.bar-chart-bar').forEach(bar => { bar.style.width = bar.getAttribute('data-target'); }); }, 500);
-        }
+  document.getElementById('res-phase-title').textContent = (currentPhase === 'wakil' ? 'Wakil Ketua' : 'Ketua') + ' Terpilih';
 
-        function fireConfetti(colors) {
-            const duration=5000; const end=Date.now()+duration;
-            (function frame(){
-                confetti({particleCount:3,angle:60,spread:55,origin:{x:0},colors,zIndex:9999});
-                confetti({particleCount:3,angle:120,spread:55,origin:{x:1},colors,zIndex:9999});
-                if(Date.now()<end) requestAnimationFrame(frame);
-            })();
-        }
-        function startContinuousConfetti() {
-            const duration=15000; const end=Date.now()+duration; const colors=['#d97706','#2563eb','#16a34a','#dc2626','#f59e0b'];
-            (function frame(){
-                confetti({particleCount:2,angle:60,spread:55,origin:{x:0},colors,zIndex:9999});
-                confetti({particleCount:2,angle:120,spread:55,origin:{x:1},colors,zIndex:9999});
-                if(Date.now()<end) requestAnimationFrame(frame);
-            })();
-        }
+  if (w) {
+    document.getElementById('res-w-img').src = w.foto || defaultImg(w.nama);
+    document.getElementById('res-w-nama').textContent = w.nama;
+    document.getElementById('res-w-votes').textContent = w.voteCount;
+    document.getElementById('res-w-pct').textContent = total > 0 ? Math.round(w.voteCount / total * 100) : 0;
+  }
 
-        // ====================================================
-        // ADMIN LOGIN
-        // ====================================================
-        async function handleAdminLogin() {
-            const u=document.getElementById('admin-user').value.trim();
-            const p=document.getElementById('admin-pass').value.trim();
-            if(!u||!p) { Swal.fire('Error','Isi username & password','error'); return; }
-            showLoading('Login...');
-            const res = await fetchAPI('login', {username:u, password:p});
-            closeLoading();
-            if(res.status) { showScreen('screen-admin'); fetchAdminData(); }
-            else { Swal.fire('Error', res.message || 'Login gagal', 'error'); }
-        }
-        function logoutAdmin() { stopAdminMonitor(); showScreen('screen-admin-login'); }
+  document.getElementById('res-total').textContent = total;
+  renderBars('res-bars', data.candidates || [], total, 'var(--blue)');
 
-        // ====================================================
-        // ADMIN: FETCH & RENDER DATA
-        // ====================================================
-        async function fetchAdminData() {
-            showLoading('Memuat data...');
-            const res = await fetchAPI('getAdminData');
-            closeLoading();
-            if(!res.status || !res.data) { showToast('error','Gagal memuat data'); return; }
-            const data = res.data;
-            
-            renderAdminCandidates('admin-list-ketua', data.calonKetua || [], 'ketua');
-            renderAdminCandidates('admin-list-wakil', data.calonWakil || [], 'wakil');
-            renderAdminMembers(data.members || [], data.votes || []);
-            updateAdminSessionUI(data);
-        }
+  go('s-results');
+  document.getElementById('res-p1').style.display = 'flex';
+  document.getElementById('res-p2').style.display = 'none';
+  document.getElementById('res-p2').style.opacity = '0';
 
-        function renderAdminCandidates(containerId, list, type) {
-            const c = document.getElementById(containerId); c.innerHTML = '';
-            if(list.length===0) { c.innerHTML='<div class="text-muted text-center py-3">Belum ada kandidat</div>'; return; }
-            list.forEach(k => {
-                const defImg = `https://ui-avatars.com/api/?name=${encodeURIComponent(k.nama)}&background=random&color=fff&size=50`;
-                c.innerHTML += `<div class="bg-light border rounded p-2 mb-2 d-flex justify-content-between align-items-center">
-                    <div class="d-flex align-items-center"><img src="${k.foto||defImg}" class="candidate-img-sm me-3" onerror="this.src='${defImg}'"><span class="fw-bold text-dark">${k.nama}</span></div>
-                    <button class="btn btn-sm btn-outline-danger rounded-circle p-2 lh-1" onclick="deleteCandidate('${type}','${k.id}')"><i class="fa-solid fa-trash"></i></button>
-                </div>`;
-            });
-        }
+  var bigT = document.getElementById('res-big-title');
+  bigT.style.opacity = '0';
+  bigT.textContent = currentPhase === 'wakil' ? 'HASIL PEMILIHAN WAKIL KETUA' : 'HASIL PEMILIHAN KETUA';
+  setTimeout(function() { bigT.style.opacity = '1'; }, 100);
 
-        function renderAdminMembers(members, votes) {
-            const c = document.getElementById('admin-list-anggota');
-            document.getElementById('admin-anggota-count').innerText = `Total: ${members.length} anggota`;
-            c.innerHTML = '';
-            const votedNames = votes.map(v => (v.namaVoter||'').toLowerCase());
-            members.forEach((m, i) => {
-                const nama = m.nama || m;
-                const hasVoted = votedNames.includes(nama.toLowerCase());
-                const badge = hasVoted ? '<span class="badge bg-success rounded-pill px-3 py-1">Sudah Vote</span>' : '<span class="badge bg-secondary rounded-pill px-3 py-1">Belum</span>';
-                c.innerHTML += `<tr><td class="text-muted fw-bold">${i+1}</td><td class="fw-medium text-dark">${nama}</td><td>${badge}</td><td class="text-end"><button class="btn btn-sm btn-outline-danger" onclick="deleteMember('${nama.replace(/'/g,"\\'")}')"><i class="fa-solid fa-trash"></i></button></td></tr>`;
-            });
-        }
+  setTimeout(function() {
+    document.getElementById('res-p1').style.display = 'none';
+    var p2 = document.getElementById('res-p2');
+    p2.style.display = 'flex';
+    setTimeout(function() { p2.style.opacity = '1'; }, 50);
+    document.getElementById('res-winner').style.display = '';
+    confetti({ particleCount: 120, spread: 80, origin: { y: 0.55 }, zIndex: 9999 });
 
-        function updateAdminSessionUI(data) {
-            const sess = data.session || {};
-            const status = sess.status || 'inactive';
-            const badge = document.getElementById('admin-badge-status');
-            const stText = document.getElementById('admin-session-status-text');
-            const btnStart = document.getElementById('btn-admin-start');
-            const btnStop = document.getElementById('btn-admin-stop');
-            const btnReset = document.getElementById('btn-admin-reset');
+    setTimeout(function() {
+      document.getElementById('res-stats').style.display = '';
+      confetti({ particleCount: 60, spread: 100, origin: { y: 0.4 }, zIndex: 9999 });
+    }, 2000);
+  }, 2500);
+}
 
-            badge.innerText = `Status: ${status.toUpperCase()}`;
-            stText.innerText = `Status: ${status.toUpperCase()}`;
+function backToLanding() {
+  selectedCand = null;
+  voterName = '';
+  document.getElementById('inp-nama').value = '';
+  go('s-landing');
+}
 
-            btnStart.style.display = status==='inactive' ? 'block' : 'none';
-            btnStop.style.display = status==='active' ? 'block' : 'none';
-            btnReset.style.display = status==='finished' ? 'block' : 'none';
+// ================================================================
+// BAR CHART
+// ================================================================
+function renderBars(id, list, total, color) {
+  var el = document.getElementById(id);
+  el.innerHTML = '';
+  if (!list.length) { el.innerHTML = '<p style="color:var(--text-4);font-size:.88rem">Tidak ada data.</p>'; return; }
 
-            if(status==='inactive') badge.className='badge bg-secondary px-3 py-2';
-            else if(status==='active') badge.className='badge bg-success px-3 py-2';
-            else if(status==='finished') badge.className='badge bg-primary px-3 py-2';
+  var html = '';
+  list.forEach(function(c) {
+    var pct = total > 0 ? (c.voteCount / total * 100) : 0;
+    html += '<div class="bar-row"><div class="bar-label" title="' + c.nama + '">' + c.nama + '</div><div class="bar-track"><div class="bar-fill" style="background:' + color + ';" data-w="' + pct + '%"></div></div><div class="bar-count">' + c.voteCount + '</div></div>';
+  });
+  el.innerHTML = html;
+  setTimeout(function() { el.querySelectorAll('.bar-fill').forEach(function(b) { b.style.width = b.getAttribute('data-w'); }); }, 300);
+}
 
-            document.getElementById('admin-lat').value = sess.centerLat || '';
-            document.getElementById('admin-lng').value = sess.centerLng || '';
-            document.getElementById('admin-radius').value = sess.radius || 100;
-            document.getElementById('admin-duration').value = sess.duration || 420;
-        }
+// ================================================================
+// ADMIN
+// ================================================================
+async function adminLogin() {
+  var u = document.getElementById('adm-user').value.trim();
+  var p = document.getElementById('adm-pass').value.trim();
+  if (!u || !p) { Swal.fire('', 'Isi username & password', 'warning'); return; }
+  loading('Login...');
+  var r = await api('login', { username: u, password: p });
+  done();
+  if (r.status) { go('s-admin'); fetchAdmin(); }
+  else { Swal.fire('Gagal', r.message, 'error'); }
+}
 
-        // ====================================================
-        // ADMIN: CANDIDATES CRUD
-        // ====================================================
-        function modalAddKandidat(type) {
-            Swal.fire({
-                title: `Tambah Calon ${type==='ketua'?'Ketua':'Wakil Ketua'}`,
-                html: `<input id="swal-k-nama" class="swal2-input" placeholder="Nama Lengkap">
-                       <div class="mt-3 text-start px-3"><label class="form-label text-muted fw-bold mb-1" style="font-size:14px;">Upload Foto (JPG/PNG):</label>
-                       <input type="file" id="swal-k-foto" class="form-control" accept="image/jpeg, image/png"></div>
-                       <textarea id="swal-k-visi" class="swal2-textarea" placeholder="Visi"></textarea>
-                       <textarea id="swal-k-misi" class="swal2-textarea" placeholder="Misi"></textarea>`,
-                showCancelButton:true, confirmButtonText:'Simpan', cancelButtonText:'Batal',
-                preConfirm: () => {
-                    const nama = document.getElementById('swal-k-nama').value.trim();
-                    const visi = document.getElementById('swal-k-visi').value.trim();
-                    const misi = document.getElementById('swal-k-misi').value.trim();
-                    const fileInput = document.getElementById('swal-k-foto');
-                    
-                    if (!nama) { Swal.showValidationMessage('Nama wajib diisi!'); return false; }
-                    
-                    if (fileInput.files.length > 0) {
-                        const file = fileInput.files[0];
-                        return new Promise((resolve) => {
-                            const reader = new FileReader();
-                            reader.onload = function(e) {
-                                resolve({ nama, visi, misi, base64Data: e.target.result.split(',')[1], mimeType: file.type, fileName: file.name });
-                            };
-                            reader.readAsDataURL(file);
-                        });
-                    } else {
-                        return { nama, visi, misi };
-                    }
-                }
-            }).then(async result => {
-                if(result.isConfirmed && result.value) {
-                    showLoading('Menyimpan... (Bisa memakan waktu jika dengan foto)');
-                    await fetchAPI('addCandidate', {type, ...result.value});
-                    closeLoading(); showToast('success','Kandidat ditambahkan'); fetchAdminData();
-                }
-            });
-        }
-        async function deleteCandidate(type, id) {
-            const conf = await Swal.fire({title:'Hapus kandidat ini?', icon:'warning', showCancelButton:true, confirmButtonColor:'#dc2626', confirmButtonText:'Ya, Hapus!', cancelButtonText:'Batal'});
-            if(conf.isConfirmed) { showLoading('Menghapus...'); await fetchAPI('deleteCandidate', {type, id}); closeLoading(); showToast('success','Kandidat dihapus'); fetchAdminData(); }
-        }
+async function fetchAdmin() {
+  loading('Memuat...');
+  var r = await api('getAdminData');
+  done();
+  if (!r.status || !r.data) { toast('error', 'Gagal memuat'); return; }
+  renderAdmin(r.data);
+}
 
-        // ====================================================
-        // ADMIN: MEMBERS CRUD
-        // ====================================================
-        function modalAddAnggota() {
-            Swal.fire({title:'Tambah Anggota', input:'text', inputPlaceholder:'Nama Lengkap', showCancelButton:true, confirmButtonText:'Simpan'}).then(async result => {
-                if(result.isConfirmed && result.value) { showLoading('Menyimpan...'); await fetchAPI('addMember', {nama:result.value.trim()}); closeLoading(); showToast('success','Anggota ditambahkan'); fetchAdminData(); }
-            });
-        }
-        function modalAddAnggotaBulk() {
-            Swal.fire({title:'Tambah Anggota (Bulk)', html:'<textarea id="swal-bulk" class="swal2-textarea" placeholder="Paste nama-nama di sini\n(1 baris = 1 nama)"></textarea>', showCancelButton:true, confirmButtonText:'Simpan Semua'}).then(async result => {
-                if(result.isConfirmed) {
-                    const txt = document.getElementById('swal-bulk').value;
-                    const names = txt.split('\n').map(n=>n.trim()).filter(n=>n);
-                    if(names.length > 0) {
-                        showLoading(`Menyimpan ${names.length} anggota...`);
-                        for(const nm of names) { await fetchAPI('addMember', {nama:nm}); }
-                        closeLoading(); showToast('success',`${names.length} anggota ditambahkan`); fetchAdminData();
-                    }
-                }
-            });
-        }
-        async function deleteMember(nama) {
-            const conf = await Swal.fire({title:`Hapus ${nama}?`, icon:'warning', showCancelButton:true, confirmButtonColor:'#dc2626', confirmButtonText:'Ya, Hapus!', cancelButtonText:'Batal'});
-            if(conf.isConfirmed) { showLoading('Menghapus...'); await fetchAPI('deleteMember', {nama}); closeLoading(); showToast('success','Anggota dihapus'); fetchAdminData(); }
-        }
+function renderAdmin(d) {
+  renderAdmCandList('adm-list-ketua', d.calonKetua || [], 'ketua');
+  renderAdmCandList('adm-list-wakil', d.calonWakil || [], 'wakil');
 
-        // ====================================================
-        // ADMIN: SESSION CONTROLS
-        // ====================================================
-        async function adminStartSession() {
-            const dur = document.getElementById('admin-duration').value || 420;
-            showLoading('Memulai sesi...');
-            await fetchAPI('startSession', {duration: parseInt(dur)});
-            closeLoading(); showToast('success','Sesi voting dimulai!'); fetchAdminData();
-        }
-        async function adminStopSession() {
-            const conf = await Swal.fire({title:'Hentikan voting?', text:'Sesi akan ditutup dan hasil ditampilkan.', icon:'warning', showCancelButton:true, confirmButtonText:'Ya, Hentikan!', cancelButtonText:'Batal', confirmButtonColor:'#dc2626'});
-            if(conf.isConfirmed) { showLoading('Menghentikan...'); await fetchAPI('stopSession'); closeLoading(); showToast('success','Sesi dihentikan'); fetchAdminData(); }
-        }
-        async function adminResetSession() {
-            const conf = await Swal.fire({title:'Reset sesi?', text:'Semua data voting akan dihapus!', icon:'warning', showCancelButton:true, confirmButtonColor:'#dc2626', confirmButtonText:'Ya, Reset!', cancelButtonText:'Batal'});
-            if(conf.isConfirmed) { showLoading('Mereset...'); await fetchAPI('resetSession'); closeLoading(); showToast('success','Sesi direset'); fetchAdminData(); }
-        }
+  var members = d.members || [];
+  var votes = d.votes || [];
+  document.getElementById('adm-member-count').textContent = members.length + ' anggota';
+  var tbody = document.getElementById('adm-member-tbody');
+  tbody.innerHTML = '';
 
-        // ====================================================
-        // ADMIN: LOCATION
-        // ====================================================
-        function adminGetLocation() {
-            if(!navigator.geolocation) { Swal.fire('Error','Geolocation tidak didukung','error'); return; }
-            Swal.fire({title:'Mendapatkan lokasi...', didOpen:()=>Swal.showLoading()});
-            navigator.geolocation.getCurrentPosition(
-                pos => { Swal.close(); document.getElementById('admin-lat').value=pos.coords.latitude; document.getElementById('admin-lng').value=pos.coords.longitude; showToast('success','Lokasi berhasil didapatkan'); },
-                err => { Swal.close(); Swal.fire('Error','Gagal akses lokasi','error'); }
-            );
-        }
-        async function saveLocationSettings() {
-            const lat=document.getElementById('admin-lat').value; const lng=document.getElementById('admin-lng').value; const rad=document.getElementById('admin-radius').value;
-            showLoading('Menyimpan...');
-            await fetchAPI('setLocation', {lat, lng, radius: parseInt(rad)});
-            closeLoading(); showToast('success','Pengaturan lokasi disimpan');
-        }
+  var votedKetua = {};
+  var votedWakil = {};
+  votes.forEach(function(v) {
+    var key = (v.namaVoter || '').toLowerCase();
+    if (v.phase === 'ketua') votedKetua[key] = true;
+    if (v.phase === 'wakil') votedWakil[key] = true;
+  });
 
-        // ====================================================
-        // ADMIN: MONITOR
-        // ====================================================
-        function startAdminMonitor() { stopAdminMonitor(); fetchMonitorData(); adminMonitorInterval = setInterval(fetchMonitorData, 2000); }
-        function stopAdminMonitor() { if(adminMonitorInterval) { clearInterval(adminMonitorInterval); adminMonitorInterval=null; } }
-        async function fetchMonitorData() {
-            const res = await fetchAPI('getAdminData');
-            if(!res.status || !res.data) return;
-            const data = res.data;
-            const results = data.results || {};
-            const totalAnggota = data.totalVoters || 0;
-            const totalMasuk = results.totalVotes || 0;
-            const pct = totalAnggota > 0 ? (totalMasuk/totalAnggota)*100 : 0;
-            document.getElementById('monitor-progress-text').innerText = `${totalMasuk} / ${totalAnggota} Suara Masuk`;
-            document.getElementById('monitor-progress-bar').style.width = `${pct}%`;
-            renderBarChart('monitor-chart-ketua', results.calonKetua || [], totalMasuk, '#d97706');
-            renderBarChart('monitor-chart-wakil', results.calonWakil || [], totalMasuk, '#2563eb');
-            // Update session status badge too
-            updateAdminSessionUI(data);
-        }
-    </script>
+  members.forEach(function(m, i) {
+    var nama = m.nama || m;
+    var k = votedKetua[nama.toLowerCase()] ? '<span style="color:var(--green);font-weight:600;font-size:.82rem">Sudah</span>' : '<span style="color:var(--text-4);font-size:.82rem">Belum</span>';
+    var w = votedWakil[nama.toLowerCase()] ? '<span style="color:var(--green);font-weight:600;font-size:.82rem">Sudah</span>' : '<span style="color:var(--text-4);font-size:.82rem">Belum</span>';
+    tbody.innerHTML += '<tr><td style="color:var(--text-4)">' + (i + 1) + '</td><td style="font-weight:500">' + nama + '</td><td>' + k + '</td><td>' + w + '</td><td class="text-end"><button class="btn btn-sm btn-outline-danger" onclick="admDelMember(\'' + nama.replace(/'/g, "\\'") + '\')"><i class="fa-solid fa-trash"></i></button></td></tr>';
+  });
+
+  var sess = d.session || {};
+  var st = sess.status || 'inactive';
+  var ph = sess.phase || 'ketua';
+
+  var badge = document.getElementById('adm-status-badge');
+  badge.textContent = st.toUpperCase() + ' (' + (ph === 'wakil' ? 'Wakil' : 'Ketua') + ')';
+  badge.style.background = st === 'active' ? 'var(--green-light)' : st === 'finished' ? 'var(--blue-light)' : 'var(--bg)';
+  badge.style.color = st === 'active' ? 'var(--green)' : st === 'finished' ? 'var(--blue)' : 'var(--text-3)';
+
+  document.getElementById('adm-sess-label').textContent = 'Status: ' + st.toUpperCase();
+  document.getElementById('adm-phase').value = ph;
+  document.getElementById('adm-duration').value = sess.duration || 420;
+  document.getElementById('adm-lat').value = sess.centerLat || '';
+  document.getElementById('adm-lng').value = sess.centerLng || '';
+  document.getElementById('adm-radius').value = sess.radius || 100;
+
+  document.getElementById('btn-a-start').style.display = st === 'inactive' ? '' : 'none';
+  document.getElementById('btn-a-stop').style.display = st === 'active' ? '' : 'none';
+  document.getElementById('btn-a-reset').style.display = st === 'finished' ? '' : 'none';
+  document.getElementById('btn-a-reset-all').style.display = st === 'finished' ? '' : 'none';
+}
+
+function renderAdmCandList(id, list, type) {
+  var el = document.getElementById(id);
+  el.innerHTML = '';
+  if (!list.length) { el.innerHTML = '<p style="color:var(--text-4);font-size:.88rem;text-align:center;padding:16px">Belum ada kandidat</p>'; return; }
+  list.forEach(function(k) {
+    var img = k.foto || defaultImg(k.nama);
+    el.innerHTML += '<div class="d-flex justify-content-between align-items-center p-2 mb-2" style="background:var(--bg);border:1px solid var(--border);border-radius:8px"><div class="d-flex align-items-center gap-2"><img src="' + img + '" class="cand-photo-sm" onerror="this.src=\'' + defaultImg(k.nama) + '\'"><span style="font-weight:600;font-size:.9rem">' + k.nama + '</span></div><button class="btn btn-sm btn-outline-danger" onclick="admDelCand(\'' + type + '\',\'' + k.id + '\')"><i class="fa-solid fa-trash"></i></button></div>';
+  });
+}
+
+function modalAddCand(type) {
+  Swal.fire({
+    title: 'Tambah Calon ' + (type === 'ketua' ? 'Ketua' : 'Wakil Ketua'),
+    html: '<input id="sw-nama" class="swal2-input" placeholder="Nama Lengkap">' +
+          '<div style="text-align:left;padding:0 1.6em;margin-top:8px"><label style="font-size:.85rem;font-weight:600;color:#6b7280">Foto (JPG/PNG):</label><input type="file" id="sw-foto" class="form-control form-control-sm mt-1" accept="image/jpeg,image/png"></div>' +
+          '<textarea id="sw-visi" class="swal2-textarea" placeholder="Visi"></textarea>' +
+          '<textarea id="sw-misi" class="swal2-textarea" placeholder="Misi"></textarea>',
+    showCancelButton: true, confirmButtonText: 'Simpan', cancelButtonText: 'Batal',
+    preConfirm: function() {
+      var nama = document.getElementById('sw-nama').value.trim();
+      var visi = document.getElementById('sw-visi').value.trim();
+      var misi = document.getElementById('sw-misi').value.trim();
+      var fi = document.getElementById('sw-foto');
+      if (!nama) { Swal.showValidationMessage('Nama wajib diisi'); return false; }
+      if (fi.files.length > 0) {
+        var file = fi.files[0];
+        return new Promise(function(resolve) {
+          var reader = new FileReader();
+          reader.onload = function(e) { resolve({ nama: nama, visi: visi, misi: misi, base64Data: e.target.result.split(',')[1], mimeType: file.type, fileName: file.name }); };
+          reader.readAsDataURL(file);
+        });
+      }
+      return { nama: nama, visi: visi, misi: misi };
+    }
+  }).then(async function(res) {
+    if (res.isConfirmed && res.value) {
+      loading('Menyimpan...');
+      await api('addCandidate', Object.assign({ type: type }, res.value));
+      done(); toast('success', 'Kandidat ditambahkan'); fetchAdmin();
+    }
+  });
+}
+
+async function admDelCand(type, id) {
+  var c = await Swal.fire({ title: 'Hapus kandidat?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#dc2626', confirmButtonText: 'Hapus', cancelButtonText: 'Batal' });
+  if (c.isConfirmed) { loading('Menghapus...'); await api('deleteCandidate', { type: type, id: id }); done(); toast('success', 'Dihapus'); fetchAdmin(); }
+}
+
+function modalAddOne() {
+  Swal.fire({ title: 'Tambah Anggota', input: 'text', inputPlaceholder: 'Nama Lengkap', showCancelButton: true, confirmButtonText: 'Simpan' }).then(async function(r) {
+    if (r.isConfirmed && r.value) { loading('Menyimpan...'); await api('addMember', { nama: r.value.trim() }); done(); toast('success', 'Ditambahkan'); fetchAdmin(); }
+  });
+}
+
+function modalBulkAdd() {
+  Swal.fire({ title: 'Tambah Anggota (Bulk)', html: '<textarea id="sw-bulk" class="swal2-textarea" placeholder="Satu nama per baris"></textarea>', showCancelButton: true, confirmButtonText: 'Simpan' }).then(async function(r) {
+    if (r.isConfirmed) {
+      var names = document.getElementById('sw-bulk').value.split('\n').map(function(n) { return n.trim(); }).filter(function(n) { return n; });
+      if (names.length) {
+        loading('Menyimpan ' + names.length + ' anggota...');
+        for (var i = 0; i < names.length; i++) { await api('addMember', { nama: names[i] }); }
+        done(); toast('success', names.length + ' anggota ditambahkan'); fetchAdmin();
+      }
+    }
+  });
+}
+
+async function admDelMember(nama) {
+  var c = await Swal.fire({ title: 'Hapus ' + nama + '?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#dc2626', confirmButtonText: 'Hapus', cancelButtonText: 'Batal' });
+  if (c.isConfirmed) { loading('Menghapus...'); await api('deleteMember', { nama: nama }); done(); toast('success', 'Dihapus'); fetchAdmin(); }
+}
+
+async function admStart() {
+  var phase = document.getElementById('adm-phase').value;
+  var dur = document.getElementById('adm-duration').value || 420;
+  loading('Memulai sesi...');
+  await api('startSession', { phase: phase, duration: parseInt(dur) });
+  done(); toast('success', 'Sesi dimulai'); fetchAdmin();
+}
+
+async function admStop() {
+  var c = await Swal.fire({ title: 'Hentikan voting?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Hentikan', confirmButtonColor: '#dc2626', cancelButtonText: 'Batal' });
+  if (c.isConfirmed) { loading('Menghentikan...'); await api('stopSession'); done(); toast('success', 'Sesi dihentikan'); fetchAdmin(); }
+}
+
+async function admReset() {
+  var c = await Swal.fire({ title: 'Reset sesi ini?', text: 'Data voting untuk fase ini akan dihapus.', icon: 'warning', showCancelButton: true, confirmButtonColor: '#dc2626', confirmButtonText: 'Reset', cancelButtonText: 'Batal' });
+  if (c.isConfirmed) { loading('Mereset...'); await api('resetSession', {}); done(); toast('success', 'Sesi direset'); fetchAdmin(); }
+}
+
+async function admResetAll() {
+  var c = await Swal.fire({ title: 'Reset SEMUA data voting?', text: 'Semua suara (ketua & wakil) akan dihapus permanen.', icon: 'warning', showCancelButton: true, confirmButtonColor: '#dc2626', confirmButtonText: 'Reset Semua', cancelButtonText: 'Batal' });
+  if (c.isConfirmed) { loading('Mereset...'); await api('resetSession', { resetAll: true }); done(); toast('success', 'Semua data direset'); fetchAdmin(); }
+}
+
+function admGrabLoc() {
+  if (!navigator.geolocation) { Swal.fire('', 'Geolocation tidak didukung', 'error'); return; }
+  Swal.fire({ title: 'Mendapatkan lokasi...', didOpen: function() { Swal.showLoading(); } });
+  navigator.geolocation.getCurrentPosition(
+    function(p) { Swal.close(); document.getElementById('adm-lat').value = p.coords.latitude; document.getElementById('adm-lng').value = p.coords.longitude; toast('success', 'Lokasi didapat'); },
+    function() { Swal.close(); Swal.fire('', 'Gagal akses lokasi', 'error'); }
+  );
+}
+
+async function admSaveLoc() {
+  loading('Menyimpan...');
+  await api('setLocation', { lat: document.getElementById('adm-lat').value, lng: document.getElementById('adm-lng').value, radius: parseInt(document.getElementById('adm-radius').value) });
+  done(); toast('success', 'Lokasi disimpan');
+}
+
+function startAdmMonitor() { stopAdmMonitor(); doMonitor(); monitorId = setInterval(doMonitor, 2500); }
+function stopAdmMonitor() { if (monitorId) { clearInterval(monitorId); monitorId = null; } }
+
+async function doMonitor() {
+  var r = await api('getAdminData');
+  if (!r.status || !r.data) return;
+  var d = r.data;
+  var rk = d.resultsKetua || {};
+  var rw = d.resultsWakil || {};
+  var totalV = d.totalVoters || 0;
+  var totalKVotes = rk.totalVotes || 0;
+  var totalWVotes = rw.totalVotes || 0;
+  var sess = d.session || {};
+  var phase = sess.phase || 'ketua';
+  var activeVotes = phase === 'wakil' ? totalWVotes : totalKVotes;
+
+  var pct = totalV > 0 ? (activeVotes / totalV * 100) : 0;
+  document.getElementById('mon-badge').textContent = activeVotes + ' / ' + totalV + ' suara (' + (phase === 'wakil' ? 'Wakil' : 'Ketua') + ')';
+  document.getElementById('mon-progress').style.width = pct + '%';
+
+  renderBars('mon-bars-ketua', rk.candidates || [], rk.totalVotes || 0, 'var(--amber)');
+  renderBars('mon-bars-wakil', rw.candidates || [], rw.totalVotes || 0, 'var(--blue)');
+
+  renderAdmin(d);
+}
+</script>
 </body>
 </html>
