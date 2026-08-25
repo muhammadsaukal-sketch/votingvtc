@@ -74,14 +74,14 @@ body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg)
 .cand-card .pick-mark{position:absolute;top:12px;right:12px;width:28px;height:28px;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.85rem;opacity:0;transform:scale(.5);transition:all .2s}
 .cand-card.picked .pick-mark{opacity:1;transform:scale(1)}
 
-.cand-photo{width:100px;height:100px;border-radius:50%;object-fit:cover;border:3px solid var(--bg);margin-bottom:12px}
-.cand-photo-sm{width:40px;height:40px;border-radius:50%;object-fit:cover;border:1px solid var(--border)}
+.cand-photo{width:110px;height:110px;border-radius:50%;object-fit:cover;object-position:center top;border:3px solid var(--bg);margin-bottom:12px;background:#fff}
+.cand-photo-sm{width:40px;height:40px;border-radius:50%;object-fit:cover;object-position:center top;border:1px solid var(--border)}
 
 .vm-box{margin-top:12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:left;font-size:.88rem;color:var(--text-2);display:none;line-height:1.5}
 
 /* Winner */
 .winner-wrap{background:var(--white);border:1px solid var(--border);border-radius:20px;padding:36px 28px;text-align:center;max-width:380px;width:100%;box-shadow:var(--shadow-md)}
-.winner-photo{width:130px;height:130px;border-radius:50%;object-fit:cover;border:4px solid var(--bg);margin-bottom:16px;box-shadow:var(--shadow)}
+.winner-photo{width:140px;height:140px;border-radius:50%;object-fit:cover;object-position:center top;border:4px solid var(--bg);margin-bottom:16px;box-shadow:var(--shadow);background:#fff}
 
 /* Bar chart */
 .bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
@@ -398,15 +398,15 @@ async function api(action, params) {
 // NAV
 // ================================================================
 const HASH_MAP = {
-  's-landing': 'beranda',
-  's-location': 'cek-lokasi',
-  's-waiting': 'ruang-tunggu',
-  's-vote': 'sesi-voting',
-  's-confirm': 'konfirmasi',
-  's-done': 'selesai',
-  's-results': 'hasil',
-  's-admin-login': 'admin-login',
-  's-admin': 'dashboard-admin'
+  's-landing': '#beranda',
+  's-location': '#cek-lokasi',
+  's-waiting': '#ruang-tunggu',
+  's-vote': '#sesi-voting',
+  's-confirm': '#konfirmasi',
+  's-done': '#selesai',
+  's-results': '#hasil',
+  's-admin-login': '#admin-login',
+  's-admin': '#dashboard-admin'
 };
 
 function go(id) {
@@ -668,7 +668,11 @@ async function showResults() {
   document.getElementById('res-phase-title').textContent = (currentPhase === 'wakil' ? 'Wakil Ketua' : 'Ketua') + ' Terpilih';
 
   if (w) {
-    document.getElementById('res-w-img').src = w.foto || defaultImg(w.nama);
+    var wImg = document.getElementById('res-w-img');
+    var defImg = defaultImg(w.nama);
+    wImg.src = w.foto || defImg;
+    wImg.onerror = function() { this.src = defImg; };
+    
     document.getElementById('res-w-nama').textContent = w.nama;
     document.getElementById('res-w-votes').textContent = w.voteCount;
     document.getElementById('res-w-pct').textContent = total > 0 ? Math.round(w.voteCount / total * 100) : 0;
@@ -819,11 +823,33 @@ function modalAddCand(type) {
       var misi = document.getElementById('sw-misi').value.trim();
       var fi = document.getElementById('sw-foto');
       if (!nama) { Swal.showValidationMessage('Nama wajib diisi'); return false; }
+      
       if (fi.files.length > 0) {
         var file = fi.files[0];
         return new Promise(function(resolve) {
           var reader = new FileReader();
-          reader.onload = function(e) { resolve({ nama: nama, visi: visi, misi: misi, base64Data: e.target.result.split(',')[1], mimeType: file.type, fileName: file.name }); };
+          reader.onload = function(e) {
+            var img = new Image();
+            img.onload = function() {
+              var canvas = document.createElement('canvas');
+              var maxW = 500, maxH = 500;
+              var width = img.width, height = img.height;
+              
+              if (width > height) {
+                if (width > maxW) { height *= maxW / width; width = maxW; }
+              } else {
+                if (height > maxH) { width *= maxH / height; height = maxH; }
+              }
+              
+              canvas.width = width; canvas.height = height;
+              var ctx = canvas.getContext('2d');
+              ctx.drawImage(img, 0, 0, width, height);
+              
+              var dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+              resolve({ nama: nama, visi: visi, misi: misi, base64Data: dataUrl.split(',')[1], mimeType: 'image/jpeg', fileName: file.name + '.jpg' });
+            };
+            img.src = e.target.result;
+          };
           reader.readAsDataURL(file);
         });
       }
