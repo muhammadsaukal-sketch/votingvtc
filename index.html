@@ -832,7 +832,7 @@ function modalAddCand(type) {
             var img = new Image();
             img.onload = function() {
               var canvas = document.createElement('canvas');
-              var maxW = 500, maxH = 500;
+              var maxW = 250, maxH = 250;
               var width = img.width, height = img.height;
               
               if (width > height) {
@@ -845,8 +845,13 @@ function modalAddCand(type) {
               var ctx = canvas.getContext('2d');
               ctx.drawImage(img, 0, 0, width, height);
               
-              var dataUrl = canvas.toDataURL('image/jpeg', 0.7);
-              resolve({ nama: nama, visi: visi, misi: misi, base64Data: dataUrl.split(',')[1], mimeType: 'image/jpeg', fileName: file.name + '.jpg' });
+              var dataUrl = canvas.toDataURL('image/jpeg', 0.6);
+              if (dataUrl.length > 45000) {
+                Swal.fire('Error', 'Foto masih terlalu besar setelah dikompres. Silakan gunakan foto lain.', 'error');
+                resolve(false);
+              } else {
+                resolve({ nama: nama, visi: visi, misi: misi, fotoBase64: dataUrl });
+              }
             };
             img.src = e.target.result;
           };
