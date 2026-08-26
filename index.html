@@ -318,6 +318,10 @@ body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg)
         <div class="col-md-6 mb-4">
           <h6 style="font-weight:700;margin-bottom:12px">Lokasi</h6>
           <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:20px">
+            <div class="form-check form-switch mb-3">
+              <input class="form-check-input" type="checkbox" id="adm-loc-enable">
+              <label class="form-check-label text-sm fw-bold" style="color:var(--text-2)" for="adm-loc-enable">Wajibkan Verifikasi GPS Voter</label>
+            </div>
             <button class="btn btn-sm btn-outline-primary mb-3" onclick="admGrabLoc()"><i class="fa-solid fa-location-crosshairs"></i> Ambil Lokasi Saya</button>
             <div class="row mb-2">
               <div class="col-6"><label class="form-label text-sm" style="font-weight:600;color:var(--text-3)">Lat</label><input type="text" id="adm-lat" class="form-control form-control-sm" style="background:var(--white)"></div>
@@ -457,7 +461,8 @@ async function enterVoter() {
     currentPhase = sess.phase || 'ketua';
     candidateList = s.data.candidates || [];
 
-    if (sess.centerLat && sess.centerLng) {
+    var isLocEnabled = (sess.requireLocation === 'true' || sess.requireLocation === true);
+    if (isLocEnabled && sess.centerLat && sess.centerLng) {
       go('s-location');
       setTimeout(doLocCheck, 400);
     } else {
@@ -789,6 +794,8 @@ function renderAdmin(d) {
   document.getElementById('adm-sess-label').textContent = 'Status: ' + st.toUpperCase();
   document.getElementById('adm-phase').value = ph;
   document.getElementById('adm-duration').value = sess.duration || 420;
+  
+  document.getElementById('adm-loc-enable').checked = (sess.requireLocation === 'true' || sess.requireLocation === true);
   document.getElementById('adm-lat').value = sess.centerLat || '';
   document.getElementById('adm-lng').value = sess.centerLng || '';
   document.getElementById('adm-radius').value = sess.radius || 100;
@@ -932,8 +939,13 @@ function admGrabLoc() {
 
 async function admSaveLoc() {
   loading('Menyimpan...');
-  await api('setLocation', { lat: document.getElementById('adm-lat').value, lng: document.getElementById('adm-lng').value, radius: parseInt(document.getElementById('adm-radius').value) });
-  done(); toast('success', 'Lokasi disimpan');
+  await api('setLocation', { 
+    requireLocation: document.getElementById('adm-loc-enable').checked,
+    lat: document.getElementById('adm-lat').value, 
+    lng: document.getElementById('adm-lng').value, 
+    radius: parseInt(document.getElementById('adm-radius').value) 
+  });
+  done(); toast('success', 'Pengaturan lokasi disimpan');
 }
 
 function startAdmMonitor() { stopAdmMonitor(); doMonitor(); monitorId = setInterval(doMonitor, 2500); }
