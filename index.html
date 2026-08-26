@@ -147,7 +147,8 @@ body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg)
     <i class="fa-solid fa-clock" style="font-size:2.4rem;color:var(--text-4);margin-bottom:16px"></i>
     <h3 style="font-weight:700;font-size:1.15rem;margin-bottom:6px">Menunggu Sesi Dibuka</h3>
     <p id="wait-phase" style="color:var(--text-3);font-size:.9rem;margin-bottom:20px">Pemilihan Ketua</p>
-    <p id="wait-count" style="color:var(--text-4);font-size:.85rem"><i class="fa-solid fa-users" style="margin-right:6px"></i>-- anggota terdaftar</p>
+    <p id="wait-count" style="color:var(--text-4);font-size:.85rem;margin-bottom:24px"><i class="fa-solid fa-users" style="margin-right:6px"></i>-- anggota terdaftar</p>
+    <button class="btn-outline" style="font-size:.85rem;padding:8px 16px" onclick="logoutVoter()">Keluar / Ganti Akun</button>
   </div>
 </div>
 
@@ -184,10 +185,11 @@ body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg)
     <i class="fa-solid fa-circle-check" style="font-size:3.5rem;color:var(--green);margin-bottom:16px"></i>
     <h2 style="font-weight:800;font-size:1.3rem;color:var(--green);margin-bottom:6px">Suara Tercatat</h2>
     <p style="color:var(--text-3);margin-bottom:24px;font-size:.95rem">Terima kasih atas partisipasi Anda.</p>
-    <div style="display:flex;align-items:center;justify-content:center;gap:8px;color:var(--text-4);font-size:.88rem">
+    <div style="display:flex;align-items:center;justify-content:center;gap:8px;color:var(--text-4);font-size:.88rem;margin-bottom:24px">
       <div class="spinner-border spinner-border-sm" role="status" style="color:var(--blue)"></div>
       <span>Menunggu sesi ditutup...</span>
     </div>
+    <button class="btn-outline" style="font-size:.85rem;padding:8px 16px" onclick="logoutVoter()">Keluar / Ganti Akun</button>
   </div>
 </div>
 
@@ -438,23 +440,69 @@ function haversine(a, b, c, d) {
 }
 
 // ================================================================
+// AUTO LOGIN
+// ================================================================
+window.addEventListener('DOMContentLoaded', function() {
+  var savedName = localStorage.getItem('vtc_voter_nama');
+  if (savedName && location.hash !== '#admin-login' && location.hash !== '#dashboard-admin') {
+    document.getElementById('inp-nama').value = savedName;
+    enterVoter(true);
+  }
+});
+
+function logoutVoter() {
+  localStorage.removeItem('vtc_voter_nama');
+  voterName = '';
+  document.getElementById('inp-nama').value = '';
+  stopPoll();
+  if (countdownId) { clearInterval(countdownId); countdownId = null; }
+  go('s-landing');
+}
+
+// ================================================================
 // VOTER FLOW
 // ================================================================
-async function enterVoter() {
+async function enterVoter(isAuto) {
   var name = document.getElementById('inp-nama').value.trim();
-  if (!name) { Swal.fire('', 'Masukkan nama Anda', 'warning'); return; }
+  if (!name) { if (!isAuto) Swal.fire('', 'Masukkan nama Anda', 'warning'); return; }
 
-  loading('Memverifikasi...');
+  if (!isAuto) loading('Memverifikasi...');
   var r = await api('validateVoter', { nama: name });
-  done();
+  if (!isAuto) done();
 
-  if (!r.status) { Swal.fire('Ditolak', r.message, 'error'); return; }
+  if (!r.status) {
+    if (r.code === 'ALREADY_VOTED') {
+      voterName = name;
+      localStorage.setItem('vtc_voter_nama', name);
+      go('s-done');
+      waitForEnd();
+      return;
+    }
+    if (r.code === 'SESSION_INACTIVE') {
+      voterName = name;
+      localStorage.setItem('vtc_voter_nama', name);
+      goWaiting();
+      return;
+    }
+    if (r.code === 'SESSION_FINISHED') {
+      voterName = name;
+      localStorage.setItem('vtc_voter_nama', name);
+      // Try to determine phase, fallback to 'ketua'
+      currentPhase = r.phase || 'ketua'; 
+      showResults();
+      return;
+    }
+    if (!isAuto) Swal.fire('Ditolak', r.message, 'error');
+    else localStorage.removeItem('vtc_voter_nama');
+    return;
+  }
 
   voterName = name;
+  localStorage.setItem('vtc_voter_nama', name);
 
-  loading('Memuat sesi...');
+  if (!isAuto) loading('Memuat sesi...');
   var s = await api('getSessionData');
-  done();
+  if (!isAuto) done();
 
   if (s.status && s.data) {
     var sess = s.data.session;
@@ -713,9 +761,7 @@ async function showResults() {
 
 function backToLanding() {
   selectedCand = null;
-  voterName = '';
-  document.getElementById('inp-nama').value = '';
-  go('s-landing');
+  logoutVoter();
 }
 
 // ================================================================
