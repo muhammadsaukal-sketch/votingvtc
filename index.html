@@ -257,14 +257,21 @@ body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg)
     <!-- TAB KANDIDAT -->
     <div class="tab-pane fade show active" id="tab-kandidat">
       <div class="row">
-        <div class="col-md-6 mb-4">
+        <div class="col-md-4 mb-4">
+          <div class="d-flex justify-content-between align-items-center mb-2 pb-2" style="border-bottom:1px solid var(--border)">
+            <h6 style="font-weight:700;margin:0">Calon Demo</h6>
+            <button class="btn btn-sm btn-primary" onclick="modalAddCand('demo')"><i class="fa-solid fa-plus"></i> Tambah</button>
+          </div>
+          <div id="adm-list-demo"></div>
+        </div>
+        <div class="col-md-4 mb-4">
           <div class="d-flex justify-content-between align-items-center mb-2 pb-2" style="border-bottom:1px solid var(--border)">
             <h6 style="font-weight:700;margin:0">Calon Ketua</h6>
             <button class="btn btn-sm btn-primary" onclick="modalAddCand('ketua')"><i class="fa-solid fa-plus"></i> Tambah</button>
           </div>
           <div id="adm-list-ketua"></div>
         </div>
-        <div class="col-md-6 mb-4">
+        <div class="col-md-4 mb-4">
           <div class="d-flex justify-content-between align-items-center mb-2 pb-2" style="border-bottom:1px solid var(--border)">
             <h6 style="font-weight:700;margin:0">Calon Wakil Ketua</h6>
             <button class="btn btn-sm btn-primary" onclick="modalAddCand('wakil')"><i class="fa-solid fa-plus"></i> Tambah</button>
@@ -301,6 +308,7 @@ body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg)
             <div class="mb-3">
               <label class="form-label text-sm" style="font-weight:600;color:var(--text-3)">Fase</label>
               <select id="adm-phase" class="form-select form-select-sm" style="background:var(--white)">
+                <option value="demo">Sesi Latihan / Demo</option>
                 <option value="ketua">Pemilihan Ketua</option>
                 <option value="wakil">Pemilihan Wakil Ketua</option>
               </select>
@@ -346,13 +354,19 @@ body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg)
         <div id="mon-progress" class="progress-bar" style="width:0%;background:var(--green)"></div>
       </div>
       <div class="row">
-        <div class="col-md-6 mb-3">
+        <div class="col-md-4 mb-3">
+          <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:16px">
+            <h6 style="font-weight:700;font-size:.88rem;margin-bottom:10px">Perolehan Demo</h6>
+            <div id="mon-bars-demo"></div>
+          </div>
+        </div>
+        <div class="col-md-4 mb-3">
           <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:16px">
             <h6 style="font-weight:700;font-size:.88rem;margin-bottom:10px">Perolehan Ketua</h6>
             <div id="mon-bars-ketua"></div>
           </div>
         </div>
-        <div class="col-md-6 mb-3">
+        <div class="col-md-4 mb-3">
           <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:16px">
             <h6 style="font-weight:700;font-size:.88rem;margin-bottom:10px">Perolehan Wakil Ketua</h6>
             <div id="mon-bars-wakil"></div>
@@ -376,7 +390,7 @@ const API = 'https://script.google.com/macros/s/AKfycbyGPljtgtygouey50siBdXGg57b
 let voterName = '';
 let selectedCand = null;
 let candidateList = [];
-let currentPhase = 'ketua';
+let currentPhase = 'demo';
 let remainSec = 0;
 let countdownId = null;
 let pollId = null;
@@ -430,7 +444,7 @@ function toast(icon, msg) { Swal.fire({ toast: true, position: 'top-end', icon: 
 function startPoll(fn, ms) { stopPoll(); fn(); pollId = setInterval(fn, ms || 2500); }
 function stopPoll() { if (pollId) { clearInterval(pollId); pollId = null; } }
 
-function phaseLabel(p) { return p === 'wakil' ? 'Pemilihan Wakil Ketua' : 'Pemilihan Ketua'; }
+function phaseLabel(p) { return p === 'demo' ? 'Sesi Latihan / Demo' : p === 'wakil' ? 'Pemilihan Wakil Ketua' : 'Pemilihan Ketua'; }
 function defaultImg(nama) { return 'https://ui-avatars.com/api/?name=' + encodeURIComponent(nama) + '&background=e5e7eb&color=374151&size=200&bold=true'; }
 
 function haversine(a, b, c, d) {
@@ -506,7 +520,7 @@ async function enterVoter(isAuto) {
 
   if (s.status && s.data) {
     var sess = s.data.session;
-    currentPhase = sess.phase || 'ketua';
+    currentPhase = sess.phase || 'demo';
     candidateList = s.data.candidates || [];
 
     var isLocEnabled = (sess.requireLocation === 'true' || sess.requireLocation === true);
@@ -581,7 +595,7 @@ function goWaiting() {
     var r = await api('getSessionData');
     if (!r.status || !r.data) return;
     var sess = r.data.session;
-    currentPhase = sess.phase || 'ketua';
+    currentPhase = sess.phase || 'demo';
     candidateList = r.data.candidates || [];
 
     document.getElementById('wait-phase').textContent = phaseLabel(currentPhase);
@@ -718,7 +732,7 @@ async function showResults() {
   var w = data.winner;
   var total = data.totalVotes || 0;
 
-  document.getElementById('res-phase-title').textContent = (currentPhase === 'wakil' ? 'Wakil Ketua' : 'Ketua') + ' Terpilih';
+  document.getElementById('res-phase-title').textContent = (currentPhase === 'demo' ? 'Kandidat Demo' : currentPhase === 'wakil' ? 'Wakil Ketua' : 'Ketua') + ' Terpilih';
 
   if (w) {
     var wImg = document.getElementById('res-w-img');
@@ -741,7 +755,7 @@ async function showResults() {
 
   var bigT = document.getElementById('res-big-title');
   bigT.style.opacity = '0';
-  bigT.textContent = currentPhase === 'wakil' ? 'HASIL PEMILIHAN WAKIL KETUA' : 'HASIL PEMILIHAN KETUA';
+  bigT.textContent = currentPhase === 'demo' ? 'HASIL SESI DEMO' : currentPhase === 'wakil' ? 'HASIL PEMILIHAN WAKIL KETUA' : 'HASIL PEMILIHAN KETUA';
   setTimeout(function() { bigT.style.opacity = '1'; }, 100);
 
   setTimeout(function() {
@@ -804,6 +818,7 @@ async function fetchAdmin() {
 }
 
 function renderAdmin(d) {
+  renderAdmCandList('adm-list-demo', d.calonDemo || [], 'demo');
   renderAdmCandList('adm-list-ketua', d.calonKetua || [], 'ketua');
   renderAdmCandList('adm-list-wakil', d.calonWakil || [], 'wakil');
 
@@ -830,10 +845,10 @@ function renderAdmin(d) {
 
   var sess = d.session || {};
   var st = sess.status || 'inactive';
-  var ph = sess.phase || 'ketua';
+  var ph = sess.phase || 'demo';
 
   var badge = document.getElementById('adm-status-badge');
-  badge.textContent = st.toUpperCase() + ' (' + (ph === 'wakil' ? 'Wakil' : 'Ketua') + ')';
+  badge.textContent = st.toUpperCase() + ' (' + (ph === 'demo' ? 'Demo' : ph === 'wakil' ? 'Wakil' : 'Ketua') + ')';
   badge.style.background = st === 'active' ? 'var(--green-light)' : st === 'finished' ? 'var(--blue-light)' : 'var(--bg)';
   badge.style.color = st === 'active' ? 'var(--green)' : st === 'finished' ? 'var(--blue)' : 'var(--text-3)';
 
@@ -864,7 +879,7 @@ function renderAdmCandList(id, list, type) {
 
 function modalAddCand(type) {
   Swal.fire({
-    title: 'Tambah Calon ' + (type === 'ketua' ? 'Ketua' : 'Wakil Ketua'),
+    title: 'Tambah Calon ' + (type === 'demo' ? 'Demo' : type === 'ketua' ? 'Ketua' : 'Wakil Ketua'),
     html: '<input id="sw-nama" class="swal2-input" placeholder="Nama Lengkap">' +
           '<div style="text-align:left;padding:0 1.6em;margin-top:8px"><label style="font-size:.85rem;font-weight:600;color:#6b7280">Foto (JPG/PNG):</label><input type="file" id="sw-foto" class="form-control form-control-sm mt-1" accept="image/jpeg,image/png"></div>' +
           '<textarea id="sw-visi" class="swal2-textarea" placeholder="Visi"></textarea>' +
@@ -970,7 +985,7 @@ async function admReset() {
 }
 
 async function admResetAll() {
-  var c = await Swal.fire({ title: 'Reset SEMUA data voting?', text: 'Semua suara (ketua & wakil) akan dihapus permanen.', icon: 'warning', showCancelButton: true, confirmButtonColor: '#dc2626', confirmButtonText: 'Reset Semua', cancelButtonText: 'Batal' });
+  var c = await Swal.fire({ title: 'Reset SEMUA data voting?', text: 'Semua suara akan dihapus permanen.', icon: 'warning', showCancelButton: true, confirmButtonColor: '#dc2626', confirmButtonText: 'Reset Semua', cancelButtonText: 'Batal' });
   if (c.isConfirmed) { loading('Mereset...'); await api('resetSession', { resetAll: true }); done(); toast('success', 'Semua data direset'); fetchAdmin(); }
 }
 
@@ -1001,19 +1016,22 @@ async function doMonitor() {
   var r = await api('getAdminData');
   if (!r.status || !r.data) return;
   var d = r.data;
+  var rd = d.resultsDemo || {};
   var rk = d.resultsKetua || {};
   var rw = d.resultsWakil || {};
   var totalV = d.totalVoters || 0;
+  var totalDVotes = rd.totalVotes || 0;
   var totalKVotes = rk.totalVotes || 0;
   var totalWVotes = rw.totalVotes || 0;
   var sess = d.session || {};
-  var phase = sess.phase || 'ketua';
-  var activeVotes = phase === 'wakil' ? totalWVotes : totalKVotes;
+  var phase = sess.phase || 'demo';
+  var activeVotes = phase === 'demo' ? totalDVotes : phase === 'wakil' ? totalWVotes : totalKVotes;
 
   var pct = totalV > 0 ? (activeVotes / totalV * 100) : 0;
-  document.getElementById('mon-badge').textContent = activeVotes + ' / ' + totalV + ' suara (' + (phase === 'wakil' ? 'Wakil' : 'Ketua') + ')';
+  document.getElementById('mon-badge').textContent = activeVotes + ' / ' + totalV + ' suara (' + (phase === 'demo' ? 'Demo' : phase === 'wakil' ? 'Wakil' : 'Ketua') + ')';
   document.getElementById('mon-progress').style.width = pct + '%';
 
+  renderBars('mon-bars-demo', rd.candidates || [], rd.totalVotes || 0, 'var(--green)');
   renderBars('mon-bars-ketua', rk.candidates || [], rk.totalVotes || 0, 'var(--amber)');
   renderBars('mon-bars-wakil', rw.candidates || [], rw.totalVotes || 0, 'var(--blue)');
 
