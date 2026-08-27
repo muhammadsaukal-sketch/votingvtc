@@ -362,6 +362,7 @@ body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg)
         <h6 style="font-weight:700;margin:0">Monitor Live</h6>
         <div class="d-flex gap-2 align-items-center">
             <span id="mon-badge" class="badge" style="background:var(--blue);color:#fff;padding:6px 14px;font-size:.82rem">0 / 0 suara</span>
+            <button class="btn btn-sm btn-info fw-bold text-dark" onclick="window.open(location.href.split('#')[0] + '#spin-wheel', '_blank')"><i class="fa-solid fa-dharmachakra"></i> Buka Spin Wheel</button>
             <button class="btn btn-sm btn-warning fw-bold text-dark" onclick="window.open(location.href.split('#')[0] + '#layar-lebar', '_blank')"><i class="fa-solid fa-tv"></i> Buka Layar Proyektor</button>
         </div>
       </div>
@@ -420,6 +421,42 @@ body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg)
     <button class="btn btn-outline-secondary btn-sm" style="position:fixed; bottom: 20px; right: 20px;" onclick="stopPodium(); go('s-admin-login')">Tutup Layar</button>
 </div>
 
+<!-- ========== 11. SPIN WHEEL ========== -->
+<div id="s-spin" class="screen" style="background: var(--bg); min-height: 100vh;">
+  <div style="position:absolute; top:20px; left:20px; z-index:10;">
+    <button class="btn btn-outline-secondary btn-sm" onclick="go('s-admin-login')"><i class="fa-solid fa-arrow-left"></i> Kembali</button>
+  </div>
+  
+  <div style="text-align:center; width:100%; margin-top: 4vh; margin-bottom: 20px;">
+     <h1 style="font-size: 2.5vw; font-weight: 900; color: var(--blue);">UNDIAN GILIRAN PRESENTASI</h1>
+     <select id="spin-phase-select" class="form-select form-select-lg" style="width:auto; display:inline-block; margin-top:10px; font-weight:bold; box-shadow:var(--shadow);" onchange="loadSpinCandidates()">
+       <option value="ketua">Kandidat Ketua</option>
+       <option value="wakil">Kandidat Wakil Ketua</option>
+       <option value="demo">Kandidat Demo</option>
+     </select>
+  </div>
+  
+  <div style="position:relative; width: 450px; height: 450px; margin: 0 auto;">
+    <!-- Pointer -->
+    <div style="position:absolute; top:-10px; left:50%; transform:translateX(-50%); width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 30px solid var(--red); z-index: 5; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.3));"></div>
+    
+    <!-- Canvas for wheel -->
+    <canvas id="wheel-canvas" width="450" height="450" style="border-radius:50%; box-shadow: var(--shadow-md); transition: transform 4s cubic-bezier(0.25, 0.1, 0.25, 1);"></canvas>
+  </div>
+  
+  <div style="text-align:center; margin-top: 40px;">
+    <button class="btn-c btn-blue" id="btn-spin" style="font-size: 1.2rem; padding: 12px 35px; border-radius: 50px; box-shadow: var(--shadow-md);" onclick="spinWheel()"><i class="fa-solid fa-arrows-rotate"></i> PUTAR RODA</button>
+  </div>
+  
+  <div id="spin-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:90;"></div>
+  <div id="spin-winner-box" class="fade-in" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:var(--white); border:2px solid var(--blue); padding:40px; border-radius:30px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); text-align:center; z-index:100; min-width: 400px;">
+    <h2 style="font-size:1.3rem; color:var(--text-3); margin-bottom:10px; font-weight:700;">Giliran Selanjutnya:</h2>
+    <img id="spin-w-img" src="" style="width:140px; height:140px; border-radius:50%; object-fit:cover; border:5px solid var(--bg); margin-bottom:20px; box-shadow:var(--shadow);">
+    <h1 id="spin-w-name" style="font-size:2.2rem; font-weight:900; color:var(--blue); margin-bottom:20px;">Nama</h1>
+    <button class="btn-c btn-outline" style="width:100%" onclick="closeSpinWinner()">Tutup</button>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 // ================================================================
@@ -470,7 +507,8 @@ const HASH_MAP = {
   's-results': '#hasil',
   's-admin-login': '#admin-login',
   's-admin': '#dashboard-admin',
-  's-podium': '#layar-lebar'
+  's-podium': '#layar-lebar',
+  's-spin': '#spin-wheel'
 };
 
 function go(id) {
@@ -504,6 +542,11 @@ window.addEventListener('DOMContentLoaded', function() {
   if (location.hash === '#layar-lebar') {
     go('s-podium');
     startPodium();
+    return;
+  }
+  if (location.hash === '#spin-wheel') {
+    go('s-spin');
+    loadSpinCandidates();
     return;
   }
 
@@ -1215,6 +1258,131 @@ function renderPodium(candidates) {
             }, 900);
         }, item.delay);
     });
+}
+
+// ================================================================
+// SPIN WHEEL
+// ================================================================
+let spinCandidates = [];
+let spinColors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#f97316', '#14b8a6'];
+let currentSpinAngle = 0;
+let isSpinning = false;
+let wheelCanvas = null;
+
+async function loadSpinCandidates() {
+  var p = document.getElementById('spin-phase-select').value;
+  loading('Memuat data...');
+  var r = await api('getAdminData');
+  done();
+  if (!r.status || !r.data) return;
+  
+  if (p === 'ketua') spinCandidates = r.data.calonKetua || [];
+  else if (p === 'wakil') spinCandidates = r.data.calonWakil || [];
+  else spinCandidates = r.data.calonDemo || [];
+  
+  drawWheel();
+}
+
+function drawWheel() {
+  wheelCanvas = document.getElementById('wheel-canvas');
+  var ctx = wheelCanvas.getContext('2d');
+  var w = wheelCanvas.width, h = wheelCanvas.height;
+  var centerX = w / 2, centerY = h / 2;
+  var radius = w / 2;
+  
+  ctx.clearRect(0, 0, w, h);
+  
+  if (spinCandidates.length === 0) {
+    ctx.fillStyle = '#e5e7eb';
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.fillStyle = '#6b7280';
+    ctx.font = 'bold 20px Inter';
+    ctx.textAlign = 'center';
+    ctx.fillText('Belum ada kandidat', centerX, centerY);
+    return;
+  }
+  
+  var arc = 2 * Math.PI / spinCandidates.length;
+  
+  for (var i = 0; i < spinCandidates.length; i++) {
+    var angle = i * arc;
+    ctx.beginPath();
+    ctx.fillStyle = spinColors[i % spinColors.length];
+    ctx.moveTo(centerX, centerY);
+    ctx.arc(centerX, centerY, radius, angle, angle + arc, false);
+    ctx.lineTo(centerX, centerY);
+    ctx.fill();
+    
+    // Draw line divider
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = '#fff';
+    ctx.stroke();
+    
+    // Draw text
+    ctx.save();
+    ctx.translate(centerX, centerY);
+    ctx.rotate(angle + arc / 2);
+    ctx.textAlign = 'right';
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 24px Inter';
+    ctx.shadowColor = 'rgba(0,0,0,0.5)';
+    ctx.shadowBlur = 4;
+    ctx.fillText(spinCandidates[i].nama, radius - 30, 8);
+    ctx.restore();
+  }
+  
+  // Center circle
+  ctx.beginPath();
+  ctx.fillStyle = '#ffffff';
+  ctx.arc(centerX, centerY, 30, 0, 2 * Math.PI);
+  ctx.fill();
+  ctx.lineWidth = 5;
+  ctx.strokeStyle = '#e5e7eb';
+  ctx.stroke();
+}
+
+function spinWheel() {
+  if (isSpinning || spinCandidates.length === 0) return;
+  isSpinning = true;
+  document.getElementById('btn-spin').disabled = true;
+  
+  var spinTime = 4000;
+  var baseSpins = 5 * 360; 
+  
+  var winIdx = Math.floor(Math.random() * spinCandidates.length);
+  var arcDeg = 360 / spinCandidates.length;
+  
+  var targetAngle = 270 - (winIdx + 0.5) * arcDeg;
+  var randomOffset = (Math.random() * arcDeg * 0.8) - (arcDeg * 0.4); 
+  targetAngle += randomOffset;
+  
+  var currentMod = currentSpinAngle % 360;
+  var diff = targetAngle - currentMod;
+  if (diff < 0) diff += 360;
+  
+  currentSpinAngle += diff + baseSpins;
+  
+  wheelCanvas.style.transform = 'rotate(' + currentSpinAngle + 'deg)';
+  
+  setTimeout(function() {
+    isSpinning = false;
+    document.getElementById('btn-spin').disabled = false;
+    
+    var w = spinCandidates[winIdx];
+    document.getElementById('spin-w-img').src = w.foto || defaultImg(w.nama);
+    document.getElementById('spin-w-name').textContent = w.nama;
+    document.getElementById('spin-overlay').style.display = 'block';
+    document.getElementById('spin-winner-box').style.display = 'block';
+    
+    confetti({ particleCount: 150, spread: 80, origin: { y: 0.5 }, zIndex: 9999 });
+  }, spinTime + 100);
+}
+
+function closeSpinWinner() {
+  document.getElementById('spin-overlay').style.display = 'none';
+  document.getElementById('spin-winner-box').style.display = 'none';
 }
 </script>
 </body>
